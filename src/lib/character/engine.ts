@@ -44,6 +44,13 @@ import {
   applyFeedbackTags,
   extractCanonTags,
 } from "../selection/calibration";
+import {
+  appendFileNote,
+  markNoteDisputed,
+  parseFileNotes,
+  pickNewObservation,
+  confirmNote,
+} from "./file-notes";
 import type { SelectionContext, SelectedContentRow } from "../selection/types";
 import type { ContentType } from "../selection/constants";
 
@@ -109,6 +116,19 @@ export class CharacterEngine {
     if (!apiKey) throw new Error("MY_TORN_API_KEY is not configured");
 
     let player = await this.getOrCreatePlayer();
+
+    if (
+      player.file_notes.length === 0 &&
+      player.assessment_data?.assessment_text
+    ) {
+      const fileNotes = appendFileNote([], player.assessment_data.assessment_text);
+      await this.db
+        .from("player_profiles")
+        .update({ file_notes: fileNotes })
+        .eq("id", player.id);
+      player = await this.getPlayerById(player.id);
+    }
+
     const tornData = await fetchTornUser(apiKey);
     const normalized = normalizeTornSnapshot(tornData);
 
@@ -318,6 +338,22 @@ export class CharacterEngine {
       meters,
     );
 
+    let fileNotes = parseFileNotes(player.file_notes);
+    if (correction) {
+      const disputeText =
+        correction.type === "freeform"
+          ? correction.value
+          : `Not ${correction.value.toLowerCase()}.`;
+      fileNotes = markNoteDisputed(fileNotes, disputeText);
+    }
+    const newObs = pickNewObservation(
+      traits.map((t) => t.displayText),
+      fileNotes,
+    );
+    if (newObs) {
+      fileNotes = appendFileNote(fileNotes, newObs);
+    }
+
     await this.db
       .from("player_profiles")
       .update({
@@ -334,6 +370,7 @@ export class CharacterEngine {
         blocked_tags: blocked,
         preferred_tags: preferred,
         player_tags: mergeTagSets(playerTags, preferred),
+        file_notes: fileNotes,
         assessment_version: player.assessment_version + 1,
         initialized: true,
       })
@@ -517,11 +554,22 @@ export class CharacterEngine {
     const state = addCanonFacts(player.character_state, facts);
     const mergedCanonTags = [...new Set([...player.canon_tags, ...canonTags])];
 
+    let fileNotes = parseFileNotes(player.file_notes);
+    const match = fileNotes.find(
+      (n) => n.text.toLowerCase() === entry.content.trim().toLowerCase(),
+    );
+    if (match) {
+      fileNotes = confirmNote(fileNotes, match.id);
+    } else {
+      fileNotes = appendFileNote(fileNotes, entry.content.slice(0, 200), "confirmed");
+    }
+
     await this.db
       .from("player_profiles")
       .update({
         character_state: state,
         canon_tags: mergedCanonTags,
+        file_notes: fileNotes,
       })
       .eq("id", player.id);
 
@@ -662,6 +710,11 @@ export class CharacterEngine {
       player.preferred_tags,
     );
 
+    let fileNotes = parseFileNotes(player.file_notes);
+    if (mainLine?.displayText && fileNotes.length === 0) {
+      fileNotes = appendFileNote(fileNotes, mainLine.displayText);
+    }
+
     const interpretation = buildInterpretationState(
       { ...player, archetype: archetypes.primary, emerging_archetypes: archetypes.emerging },
       summary.characterFacts,
@@ -689,6 +742,7 @@ export class CharacterEngine {
         interpretation_state: interpretation,
         character_facts: summary.characterFacts,
         player_tags: playerTags,
+        file_notes: fileNotes,
         initialized: true,
       })
       .eq("id", player.id);
@@ -752,11 +806,23 @@ export class CharacterEngine {
       meters,
     );
 
+    let fileNotes = parseFileNotes(player.file_notes);
+    if (player.character_locked && observations.length > 0) {
+      const candidate = pickNewObservation(
+        observations.map((o) => o.displayText),
+        fileNotes,
+      );
+      if (candidate && (factChanges.length > 0 || Math.random() < 0.25)) {
+        fileNotes = appendFileNote(fileNotes, candidate);
+      }
+    }
+
     await this.db
       .from("player_profiles")
       .update({
         interpretation_state: interpretation,
         player_tags: playerTags,
+        file_notes: fileNotes,
       })
       .eq("id", player.id);
 
@@ -926,6 +992,7 @@ export class CharacterEngine {
       lore_meters: parseLoreMeters(row.lore_meters),
       character_state: parseCharacterState(row.character_state),
       assessment_data: parseAssessmentData(row.assessment_data),
+      file_notes: parseFileNotes(row.file_notes),
       character_facts: parseCharacterFacts(row.character_facts),
       interpretation_state: parseInterpretationState(row.interpretation_state),
       character_locked: (row.character_locked as boolean) ?? false,

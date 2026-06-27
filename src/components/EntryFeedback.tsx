@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { ENTRY_FEEDBACK_OPTIONS } from "@/lib/db/types";
 import type { LifeEntry } from "@/lib/db/types";
+import { FixRecordModal } from "./FixRecordModal";
+import { ENTRY_CORRECTIONS } from "@/lib/ui/correction-options";
 
 interface EntryFeedbackProps {
   entry: LifeEntry;
@@ -20,84 +21,60 @@ export function EntryFeedback({
   busy,
 }: EntryFeedbackProps) {
   const [open, setOpen] = useState(false);
-  const [note, setNote] = useState("");
-  const [showNote, setShowNote] = useState(false);
 
-  const handleSelect = async (feedbackType: string) => {
-    if (feedbackType === "Doesn't sound like him" && !note.trim()) {
-      setShowNote(true);
-      return;
-    }
-    await onFeedback(feedbackType, note.trim() || undefined);
+  const handleFix = async (internalKey: string, note?: string) => {
+    await onFeedback(internalKey, note);
     setOpen(false);
-    setShowNote(false);
-    setNote("");
   };
 
   return (
     <div className="entry-feedback">
       <button
         type="button"
-        className="pixel-btn tiny"
-        onClick={() => setOpen(!open)}
-        aria-expanded={open}
+        className="record-pencil"
+        onClick={() => setOpen(true)}
+        aria-label="Fix the record"
+        title="Fix the record"
       >
-        [correct]
+        ✎
       </button>
 
-      {open && (
-        <div className="feedback-panel">
-          <p className="feedback-label">Fix the record.</p>
-
-          <div className="feedback-options">
-            {ENTRY_FEEDBACK_OPTIONS.map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                className="pixel-btn tiny"
-                disabled={busy}
-                onClick={() => handleSelect(opt)}
-              >
-                {opt.toUpperCase()}
-              </button>
-            ))}
-          </div>
-
-          {(showNote || open) && (
-            <textarea
-              className="correction-textarea small"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="What is wrong with it?"
-              rows={2}
-            />
-          )}
-
-          <div className="canon-actions">
-            {entry.is_canon ? (
-              <button
-                type="button"
-                className="pixel-btn tiny"
-                disabled={busy}
-                onClick={onUnpin}
-              >
-                UNPIN
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="pixel-btn tiny"
-                disabled={busy}
-                onClick={onPin}
-              >
-                PIN AS CANON
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
       {entry.is_canon && <span className="canon-marker">CANON</span>}
+
+      <FixRecordModal
+        open={open}
+        onClose={() => setOpen(false)}
+        onSubmit={handleFix}
+        options={ENTRY_CORRECTIONS}
+        busy={busy}
+        footer={
+          entry.is_canon ? (
+            <button
+              type="button"
+              className="record-canon-link"
+              disabled={busy}
+              onClick={() => {
+                onUnpin();
+                setOpen(false);
+              }}
+            >
+              Remove from known facts
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="record-canon-link"
+              disabled={busy}
+              onClick={() => {
+                onPin();
+                setOpen(false);
+              }}
+            >
+              Add to known facts
+            </button>
+          )
+        }
+      />
     </div>
   );
 }

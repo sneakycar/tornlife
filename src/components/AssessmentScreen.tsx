@@ -1,10 +1,10 @@
 "use client";
 
 import type { PlayerProfile } from "@/lib/db/types";
-import { QUICK_CORRECTIONS } from "@/lib/db/types";
 import { DossierView } from "./dossier/DossierView";
+import { FixRecordModal } from "./FixRecordModal";
+import { ASSESSMENT_CORRECTIONS } from "@/lib/ui/correction-options";
 import { useState } from "react";
-import { voiceLine } from "@/lib/ui/narrator-voice";
 
 interface AssessmentScreenProps {
   profile: PlayerProfile;
@@ -20,14 +20,13 @@ interface AssessmentScreenProps {
 export function AssessmentScreen({
   profile,
   onLock,
-  onRegenerate,
   onCorrect,
   onRetry,
   busy,
   syncing,
   syncError,
 }: AssessmentScreenProps) {
-  const [note, setNote] = useState("");
+  const [fixOpen, setFixOpen] = useState(false);
   const assessment = profile.assessment_data;
 
   if (!assessment) {
@@ -54,6 +53,14 @@ export function AssessmentScreen({
     );
   }
 
+  const handleFix = async (internalKey: string, note?: string) => {
+    if (note && internalKey === "Doesn't sound like him") {
+      await onCorrect("freeform", note);
+    } else {
+      await onCorrect("quick", internalKey);
+    }
+  };
+
   return (
     <div className="assessment">
       <DossierView
@@ -62,76 +69,32 @@ export function AssessmentScreen({
         facts={profile.character_facts}
       />
 
-      <section className="dossier-section dossier-assessment-detail">
-        <h2 className="dossier-heading">File Notes</h2>
-        <p className="assessment-text">{voiceLine(assessment.assessment_text)}</p>
+      <footer className="assessment-footer">
+        <button
+          type="button"
+          className="pixel-btn primary"
+          disabled={busy}
+          onClick={onLock}
+        >
+          LOCK THIS LIFE
+        </button>
+        <button
+          type="button"
+          className="record-fix-link"
+          disabled={busy}
+          onClick={() => setFixOpen(true)}
+        >
+          Fix the record
+        </button>
+      </footer>
 
-        {assessment.traits.length > 0 && (
-          <ul className="dossier-detail-list">
-            {assessment.traits.map((t) => (
-              <li key={t}>{voiceLine(t)}</li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="calibration-section">
-        <p className="calibration-prompt">Adjust the record.</p>
-
-        <div className="correction-buttons">
-          {QUICK_CORRECTIONS.map((label) => (
-            <button
-              key={label}
-              type="button"
-              className="pixel-btn correction-btn"
-              disabled={busy}
-              onClick={() => onCorrect("quick", label)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="freeform-correction">
-          <textarea
-            className="correction-textarea"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="He is not a psycho, he is more of a sad drunk gambler."
-            rows={3}
-          />
-          <button
-            type="button"
-            className="pixel-btn"
-            disabled={busy || !note.trim()}
-            onClick={() => {
-              onCorrect("freeform", note.trim());
-              setNote("");
-            }}
-          >
-            APPLY CORRECTION
-          </button>
-        </div>
-
-        <div className="assessment-actions">
-          <button
-            type="button"
-            className="pixel-btn primary"
-            disabled={busy}
-            onClick={onLock}
-          >
-            LOCK THIS LIFE
-          </button>
-          <button
-            type="button"
-            className="pixel-btn"
-            disabled={busy}
-            onClick={onRegenerate}
-          >
-            TRY AGAIN
-          </button>
-        </div>
-      </section>
+      <FixRecordModal
+        open={fixOpen}
+        onClose={() => setFixOpen(false)}
+        onSubmit={handleFix}
+        options={ASSESSMENT_CORRECTIONS}
+        busy={busy}
+      />
     </div>
   );
 }

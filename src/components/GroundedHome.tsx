@@ -39,7 +39,6 @@ export function GroundedHome({
       )}
 
       <div className="logbook-section dossier-logbook">
-        <h2 className="dossier-heading">Life Log</h2>
         <Logbook
           entries={entries}
           newEntryIds={newEntryIds}

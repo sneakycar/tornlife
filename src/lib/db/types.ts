@@ -121,6 +121,21 @@ export const DEFAULT_INTERPRETATION_STATE: InterpretationState = {
   recent_observations: [],
 };
 
+export type FileNoteStatus =
+  | "active"
+  | "faded"
+  | "confirmed"
+  | "disputed"
+  | "archived";
+
+export interface FileNote {
+  id: string;
+  text: string;
+  added_at: string;
+  status: FileNoteStatus;
+  annotation?: string;
+}
+
 export interface AssessmentData {
   assessment_text: string;
   traits: string[];
@@ -176,6 +191,7 @@ export interface PlayerProfile {
   lore_meters: LoreMeters;
   character_state: CharacterState;
   assessment_data: AssessmentData | null;
+  file_notes: FileNote[];
   character_facts: CharacterFacts | null;
   interpretation_state: InterpretationState | null;
   character_locked: boolean;

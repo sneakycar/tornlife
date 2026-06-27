@@ -1,13 +1,11 @@
 import type { CharacterFacts, InterpretationState, PlayerProfile } from "@/lib/db/types";
-import { buildCharacterMemory } from "@/lib/ui/dossier-memory";
-import { buildEvidence } from "@/lib/ui/build-evidence";
 import { IdentitySection } from "./IdentitySection";
-import { CharacterMemorySection } from "./CharacterMemorySection";
 import { MeterStrip } from "./MeterStrip";
 import { WhatChangedSection } from "./WhatChangedSection";
 import { DiscoveriesSection } from "./DiscoveriesSection";
 import { KnownCanonSection } from "./KnownCanonSection";
 import { EmergingArchetypesSection } from "./EmergingArchetypesSection";
+import { FileNotesSection } from "./FileNotesSection";
 import { RealCharacterPanel } from "../RealCharacterPanel";
 
 interface DossierViewProps {
@@ -17,9 +15,6 @@ interface DossierViewProps {
 }
 
 export function DossierView({ profile, interpretation, facts }: DossierViewProps) {
-  const memory = buildCharacterMemory(profile, interpretation);
-  const evidence = buildEvidence(profile, interpretation, facts);
-
   const currentState =
     interpretation?.character_state_summary ??
     profile.assessment_data?.assessment_text ??
@@ -36,10 +31,9 @@ export function DossierView({ profile, interpretation, facts }: DossierViewProps
         username={profile.username}
         archetype={archetype}
         currentState={currentState}
-        evidence={evidence}
       />
 
-      <CharacterMemorySection memory={memory} />
+      <FileNotesSection notes={profile.file_notes ?? []} />
 
       <MeterStrip meters={profile.lore_meters} />
 
