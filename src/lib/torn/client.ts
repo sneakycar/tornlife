@@ -4,14 +4,12 @@ const TORN_API_BASE = "https://api.torn.com";
 
 const USER_SELECTIONS = [
   "profile",
-  "status",
   "job",
   "education",
   "faction",
   "travel",
   "personalstats",
   "crimes",
-  "log",
 ].join(",");
 
 export class TornApiError extends Error {

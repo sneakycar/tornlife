@@ -19,10 +19,11 @@ function describeStatus(state: string, description: string): string {
 function extractActivitySignals(data: TornUserResponse): ActivitySignal[] {
   const signals: ActivitySignal[] = [];
 
-  const state = data.status?.state ?? data.profile?.status?.state ?? "Okay";
+  const state = data.profile?.status?.state ?? "Okay";
+  const description = data.profile?.status?.description ?? "";
   signals.push({
     category: "status",
-    signal: describeStatus(state, data.status?.description ?? ""),
+    signal: describeStatus(state, description),
     weight: state === "Okay" ? 1 : 4,
   });
 
@@ -97,21 +98,12 @@ function extractActivitySignals(data: TornUserResponse): ActivitySignal[] {
     }
   }
 
-  const recentLogs = (data.log ?? []).slice(0, 5);
-  for (const entry of recentLogs) {
-    signals.push({
-      category: "recent_event",
-      signal: entry.title.toLowerCase(),
-      weight: 5,
-    });
-  }
-
   return signals;
 }
 
 export function normalizeTornSnapshot(data: TornUserResponse): NormalizedSummary {
   const profile = data.profile!;
-  const status = data.status ?? profile.status;
+  const status = profile.status;
 
   const comparisonKeys: NormalizedSummary["comparisonKeys"] = {
     statusState: status.state,
@@ -124,10 +116,7 @@ export function normalizeTornSnapshot(data: TornUserResponse): NormalizedSummary
     travelDestination: data.travel?.destination ?? "",
     maritalStatus: profile.married,
     property: profile.property,
-    recentLogIds: (data.log ?? [])
-      .slice(0, 10)
-      .map((l) => l.id)
-      .join(","),
+    recentLogIds: "",
     attackswon: (data.personalstats?.attackswon as number) ?? 0,
     hospital: (data.personalstats?.hospital as number) ?? 0,
     jailed: (data.personalstats?.jailed as number) ?? 0,
