@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { lifeService } from "@/lib/services/life-service";
+import { humanizeError } from "@/lib/utils/humanize-error";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: humanizeError(message) }, { status: 500 });
   }
 }
 

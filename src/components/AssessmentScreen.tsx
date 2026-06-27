@@ -14,7 +14,10 @@ interface AssessmentScreenProps {
   onLock: () => Promise<void>;
   onRegenerate: () => Promise<void>;
   onCorrect: (type: "quick" | "freeform", value: string) => Promise<void>;
+  onRetry: () => Promise<void>;
   busy: boolean;
+  syncing: boolean;
+  syncError: string | null;
 }
 
 export function AssessmentScreen({
@@ -22,7 +25,10 @@ export function AssessmentScreen({
   onLock,
   onRegenerate,
   onCorrect,
+  onRetry,
   busy,
+  syncing,
+  syncError,
 }: AssessmentScreenProps) {
   const [note, setNote] = useState("");
   const assessment = profile.assessment_data;
@@ -30,7 +36,23 @@ export function AssessmentScreen({
   if (!assessment) {
     return (
       <div className="assessment-loading">
-        <p className="status-whisper">Reading the file...</p>
+        {syncError ? (
+          <>
+            <p className="status-banner error">{syncError}</p>
+            <button
+              type="button"
+              className="pixel-btn"
+              disabled={syncing}
+              onClick={onRetry}
+            >
+              TRY AGAIN
+            </button>
+          </>
+        ) : (
+          <p className="status-whisper">
+            {syncing ? "Reading the file..." : "Waiting on the narrator..."}
+          </p>
+        )}
       </div>
     );
   }

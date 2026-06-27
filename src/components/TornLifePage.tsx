@@ -31,6 +31,7 @@ export function TornLifePage() {
 
   const runSync = useCallback(async () => {
     setSyncing(true);
+    setError(null);
     try {
       const res = await fetch("/api/sync", { method: "POST" });
       const body = await res.json();
@@ -208,7 +209,7 @@ export function TornLifePage() {
       <IndustrialBackground />
 
       <div className={`tornlife-content ${locked ? "" : "assessment-mode"}`}>
-        {error && (
+        {error && locked && (
           <div className="status-banner error">{error}</div>
         )}
 
@@ -218,7 +219,10 @@ export function TornLifePage() {
             onLock={handleLock}
             onRegenerate={handleRegenerate}
             onCorrect={handleCorrect}
+            onRetry={runSync}
             busy={busy || syncing}
+            syncing={syncing}
+            syncError={error}
           />
         )}
 
