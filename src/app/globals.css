@@ -1503,25 +1503,20 @@ body {
   font-size: 0.85rem;
 }
 
-/* ─── Trait pip grid (2×3, retro bitmap) ─── */
+/* ─── Trait meters (2×3, diagonal segmented retro bars) ─── */
 
 .trait-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, auto);
-  gap: 1.25rem 1rem;
+  gap: 1.35rem 1.25rem;
 }
 
 .trait-row {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-}
-
-.trait-row-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
+  min-width: 0;
 }
 
 .trait-label {
@@ -1530,38 +1525,56 @@ body {
   letter-spacing: 0.2em;
 }
 
-.trait-pip-track {
+.trait-segment-bar {
   display: flex;
-  gap: 3px;
-  align-items: flex-end;
-  transform: skewX(-12deg);
+  align-items: stretch;
+  gap: 2px;
+  padding: 3px 5px;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 55%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-deep, #08080a) 90%, #1a1a1e);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  height: 16px;
 }
 
-.bitmap-pip {
-  display: grid;
-  grid-template-columns: repeat(2, 3px);
-  grid-template-rows: repeat(2, 3px);
-  gap: 1px;
-  width: 8px;
-  height: 10px;
-  transform: rotate(-45deg);
+.trait-segment {
+  flex: 1 1 0;
+  min-width: 0;
+  transform: skewX(-22deg);
+  margin: 0 0.5px;
   image-rendering: pixelated;
 }
 
-.bitmap-pip-cell {
-  display: block;
-  width: 3px;
-  height: 3px;
-  background: transparent;
+.trait-segment--filled {
+  background-color: color-mix(in srgb, var(--trait-color) 55%, #0a0a0c);
+  background-image:
+    repeating-conic-gradient(
+      rgba(0, 0, 0, 0.55) 0% 25%,
+      rgba(255, 255, 255, 0.08) 0% 50%
+    )
+    0 0 / 3px 3px,
+    repeating-linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.35) 0,
+      rgba(0, 0, 0, 0.35) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--trait-color) 40%, transparent);
 }
 
-.bitmap-pip--on .bitmap-pip-cell {
-  background: var(--pip-color);
-  box-shadow: 1px 0 0 color-mix(in srgb, var(--pip-color) 60%, black);
-}
-
-.bitmap-pip--off .bitmap-pip-cell {
-  background: color-mix(in srgb, var(--text-dim) 25%, transparent);
+.trait-segment--empty {
+  background-color: rgba(255, 255, 255, 0.03);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.07) 0,
+    rgba(255, 255, 255, 0.07) 1px,
+    transparent 1px,
+    transparent 4px
+  );
 }
 
 .trait-sentence {
@@ -1569,13 +1582,19 @@ body {
   font-size: 0.82rem;
   line-height: 1.45;
   color: var(--text-dim);
-  max-width: 22ch;
+  max-width: 24ch;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
   .trait-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     grid-template-rows: auto;
+  }
+}
+
+@media (max-width: 400px) {
+  .trait-grid {
+    grid-template-columns: 1fr;
   }
 }
 

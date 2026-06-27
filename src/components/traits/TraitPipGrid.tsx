@@ -9,18 +9,30 @@ interface TraitPipGridProps {
   meters: LoreMeters;
 }
 
-function BitmapPip({ on, color }: { on: boolean; color: string }) {
+/** Ten diagonal segments in a pill bar — retro sports-game meter style. */
+function TraitSegmentBar({
+  filled,
+  color,
+}: {
+  filled: number;
+  color: string;
+}) {
   return (
-    <span
-      className={`bitmap-pip ${on ? "bitmap-pip--on" : "bitmap-pip--off"}`}
-      style={{ "--pip-color": color } as CSSProperties}
-      aria-hidden
+    <div
+      className="trait-segment-bar"
+      style={{ "--trait-color": color } as CSSProperties}
+      role="meter"
+      aria-valuenow={filled}
+      aria-valuemin={0}
+      aria-valuemax={10}
     >
-      <span className="bitmap-pip-cell" />
-      <span className="bitmap-pip-cell" />
-      <span className="bitmap-pip-cell" />
-      <span className="bitmap-pip-cell" />
-    </span>
+      {Array.from({ length: 10 }, (_, i) => (
+        <div
+          key={i}
+          className={`trait-segment ${i < filled ? "trait-segment--filled" : "trait-segment--empty"}`}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -39,16 +51,10 @@ function TraitRow({
 
   return (
     <div className="trait-row">
-      <div className="trait-row-header">
-        <span className="trait-label" style={{ color }}>
-          {label}
-        </span>
-        <div className="trait-pip-track">
-          {Array.from({ length: 10 }, (_, i) => (
-            <BitmapPip key={i} on={i < filled} color={color} />
-          ))}
-        </div>
-      </div>
+      <span className="trait-label" style={{ color }}>
+        {label}
+      </span>
+      <TraitSegmentBar filled={filled} color={color} />
       <p className="trait-sentence">{sentence}</p>
     </div>
   );
