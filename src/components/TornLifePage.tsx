@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { LifeEntry, PlayerProfile } from "@/lib/db/types";
+import type { FileNoticedItem } from "@/lib/trends/file-noticed";
+import type { PageEvidence } from "@/lib/ui/page-evidence";
 import { AssessmentScreen } from "@/components/AssessmentScreen";
 import { GroundedHome } from "@/components/GroundedHome";
 import { IndustrialBackground } from "@/components/IndustrialBackground";
@@ -11,6 +13,8 @@ import { showEngineDebugUi } from "@/lib/character/debug-client";
 interface LifeData {
   profile: PlayerProfile;
   entries: LifeEntry[];
+  fileNoticed: FileNoticedItem[];
+  pageEvidence: PageEvidence;
 }
 
 export function TornLifePage() {
@@ -217,6 +221,8 @@ export function TornLifePage() {
         {data && !locked && (
           <AssessmentScreen
             profile={data.profile}
+            fileNoticed={data.fileNoticed}
+            pageEvidence={data.pageEvidence}
             onLock={handleLock}
             onRegenerate={handleRegenerate}
             onCorrect={handleCorrect}
@@ -231,6 +237,8 @@ export function TornLifePage() {
           <GroundedHome
             profile={data.profile}
             entries={data.entries}
+            fileNoticed={data.fileNoticed}
+            pageEvidence={data.pageEvidence}
             newEntryIds={newEntryIds}
             syncing={syncing}
             onFeedback={handleEntryFeedback}

@@ -1421,3 +1421,85 @@ body {
   opacity: 0.9;
 }
 
+/* ─── Biography-first layout ─── */
+
+.dossier-current-read {
+  border-bottom: none;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dossier-biography-line {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  margin: 0.85rem 0 0;
+  max-width: 38ch;
+}
+
+.file-noticed-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.file-noticed-item {
+  color: var(--text-bright);
+  font-size: 1rem;
+  line-height: 1.55;
+  margin-bottom: 0.65rem;
+  max-width: 40ch;
+  padding-left: 0.85rem;
+  border-left: 2px solid var(--border-dim);
+}
+
+.file-noticed-item:last-child {
+  margin-bottom: 0;
+}
+
+.dossier-biography-entries {
+  padding-bottom: 1rem;
+}
+
+.dossier-biography-entries .logbook-empty {
+  margin-top: 0;
+}
+
+.evidence-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.evidence-link-btn:hover {
+  color: var(--text-primary);
+}
+
+.evidence-link-btn.subtle {
+  margin-top: 0.5rem;
+  font-size: 0.52rem;
+}
+
+.dossier-evidence-collapsed {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 1rem;
+}
+
+.entry-evidence {
+  margin-top: 0.35rem;
+}
+
+.evidence-list.compact {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+

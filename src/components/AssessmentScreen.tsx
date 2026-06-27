@@ -1,6 +1,8 @@
 "use client";
 
 import type { PlayerProfile } from "@/lib/db/types";
+import type { FileNoticedItem } from "@/lib/trends/file-noticed";
+import type { PageEvidence } from "@/lib/ui/page-evidence";
 import { DossierView } from "./dossier/DossierView";
 import { FixRecordModal } from "./FixRecordModal";
 import { ASSESSMENT_CORRECTIONS } from "@/lib/ui/correction-options";
@@ -8,6 +10,8 @@ import { useState } from "react";
 
 interface AssessmentScreenProps {
   profile: PlayerProfile;
+  fileNoticed: FileNoticedItem[];
+  pageEvidence: PageEvidence;
   onLock: () => Promise<void>;
   onRegenerate: () => Promise<void>;
   onCorrect: (type: "quick" | "freeform", value: string) => Promise<void>;
@@ -19,6 +23,8 @@ interface AssessmentScreenProps {
 
 export function AssessmentScreen({
   profile,
+  fileNoticed,
+  pageEvidence,
   onLock,
   onCorrect,
   onRetry,
@@ -67,6 +73,8 @@ export function AssessmentScreen({
         profile={profile}
         interpretation={profile.interpretation_state}
         facts={profile.character_facts}
+        fileNoticed={fileNoticed}
+        pageEvidence={pageEvidence}
       />
 
       <footer className="assessment-footer">

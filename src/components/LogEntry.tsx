@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { formatRelativeTime } from "@/lib/utils/relative-time";
 import type { LifeEntry } from "@/lib/db/types";
 import { EntryFeedback } from "./EntryFeedback";
+import { EntryEvidence } from "./dossier/EntryEvidence";
 
 interface LogEntryProps {
   entry: LifeEntry;
@@ -73,6 +74,9 @@ export function LogEntry({
         ))}
         {!done && <span className="typewriter-cursor">▌</span>}
       </div>
+      {entry.source_summary && (
+        <EntryEvidence sourceSummary={entry.source_summary} />
+      )}
     </article>
   );
 }

@@ -1,21 +1,46 @@
-import type { CharacterFacts, InterpretationState, PlayerProfile } from "@/lib/db/types";
+import type {
+  CharacterFacts,
+  InterpretationState,
+  LifeEntry,
+  PlayerProfile,
+} from "@/lib/db/types";
+import type { FileNoticedItem } from "@/lib/trends/file-noticed";
+import type { PageEvidence } from "@/lib/ui/page-evidence";
 import { IdentitySection } from "./IdentitySection";
-import { MeterStrip } from "./MeterStrip";
-import { WhatChangedSection } from "./WhatChangedSection";
-import { DiscoveriesSection } from "./DiscoveriesSection";
+import { FileNoticedSection } from "./FileNoticedSection";
 import { KnownCanonSection } from "./KnownCanonSection";
 import { EmergingArchetypesSection } from "./EmergingArchetypesSection";
-import { FileNotesSection } from "./FileNotesSection";
-import { RealCharacterPanel } from "../RealCharacterPanel";
+import { EvidenceSection } from "./EvidenceSection";
+import { Logbook } from "../Logbook";
+import { voiceLine } from "@/lib/ui/narrator-voice";
 
 interface DossierViewProps {
   profile: PlayerProfile;
   interpretation: InterpretationState | null;
   facts: CharacterFacts | null;
+  fileNoticed: FileNoticedItem[];
+  pageEvidence: PageEvidence;
+  entries?: LifeEntry[];
+  newEntryIds?: Set<string>;
+  onFeedback?: (entryId: string, feedbackType: string, note?: string) => Promise<void>;
+  onPin?: (entryId: string) => Promise<void>;
+  onUnpin?: (entryId: string) => Promise<void>;
+  feedbackBusy?: boolean;
 }
 
-export function DossierView({ profile, interpretation, facts }: DossierViewProps) {
-  const currentState =
+export function DossierView({
+  profile,
+  interpretation,
+  fileNoticed,
+  pageEvidence,
+  entries,
+  newEntryIds,
+  onFeedback,
+  onPin,
+  onUnpin,
+  feedbackBusy,
+}: DossierViewProps) {
+  const currentRead =
     interpretation?.character_state_summary ??
     profile.assessment_data?.assessment_text ??
     "";
@@ -23,36 +48,43 @@ export function DossierView({ profile, interpretation, facts }: DossierViewProps
   const archetype =
     interpretation?.primary_archetype ?? profile.archetype;
 
-  const canonCandidates = (interpretation?.recent_observations ?? []).slice(0, 2);
+  const biographyLines = (profile.file_notes ?? [])
+    .filter((n) => n.status !== "archived")
+    .slice(-3)
+    .map((n) => n.text);
 
   return (
     <div className="dossier">
-      <IdentitySection
-        username={profile.username}
-        archetype={archetype}
-        currentState={currentState}
-      />
+      <IdentitySection username={profile.username} archetype={archetype} />
 
-      <FileNotesSection notes={profile.file_notes ?? []} />
-
-      <MeterStrip meters={profile.lore_meters} />
-
-      {interpretation && (
-        <WhatChangedSection
-          changes={interpretation.what_changed}
-          emerging={interpretation.emerging_archetypes}
-          canonCandidates={canonCandidates}
-        />
+      {currentRead && (
+        <section className="dossier-section dossier-current-read">
+          <p className="dossier-current-state">{voiceLine(currentRead)}</p>
+          {biographyLines.map((line) => (
+            <p key={line} className="dossier-biography-line">
+              {voiceLine(line)}
+            </p>
+          ))}
+        </section>
       )}
 
-      {interpretation && (
-        <DiscoveriesSection discoveries={interpretation.discoveries} />
-      )}
+      <FileNoticedSection items={fileNoticed} />
 
-      <KnownCanonSection
-        canon={profile.character_state.canon}
-        canonTags={profile.canon_tags ?? []}
-      />
+      {entries && (
+        <section className="dossier-section dossier-biography-entries">
+          {entries.length > 0 && (
+            <h2 className="dossier-heading">Recent Entries</h2>
+          )}
+          <Logbook
+            entries={entries}
+            newEntryIds={newEntryIds}
+            onFeedback={onFeedback}
+            onPin={onPin}
+            onUnpin={onUnpin}
+            feedbackBusy={feedbackBusy}
+          />
+        </section>
+      )}
 
       {interpretation && (
         <EmergingArchetypesSection
@@ -62,7 +94,12 @@ export function DossierView({ profile, interpretation, facts }: DossierViewProps
         />
       )}
 
-      {facts && <RealCharacterPanel facts={facts} />}
+      <KnownCanonSection
+        canon={profile.character_state.canon}
+        canonTags={profile.canon_tags ?? []}
+      />
+
+      <EvidenceSection evidence={pageEvidence} />
     </div>
   );
 }

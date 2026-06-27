@@ -15,7 +15,7 @@ export function EmergingArchetypesSection({
 
   return (
     <section className="dossier-section dossier-archetypes">
-      <h2 className="dossier-heading">Archetypes</h2>
+      <h2 className="dossier-heading">Character Drift</h2>
 
       <div className="archetype-primary-block">
         <p className="archetype-role-label">Primary</p>
