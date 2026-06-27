@@ -1,5 +1,6 @@
 import type {
   CharacterFacts,
+  EmergingArchetype,
   InterpretationState,
   LifeEntry,
   PlayerProfile,
@@ -9,9 +10,10 @@ import type { PageEvidence } from "@/lib/ui/page-evidence";
 import { IdentitySection } from "./IdentitySection";
 import { FileNoticedSection } from "./FileNoticedSection";
 import { KnownCanonSection } from "./KnownCanonSection";
-import { EmergingArchetypesSection } from "./EmergingArchetypesSection";
 import { EvidenceSection } from "./EvidenceSection";
 import { Logbook } from "../Logbook";
+import { TraitPipGrid } from "../traits/TraitPipGrid";
+import { ArchetypeSystem } from "../archetypes/ArchetypeSystem";
 import { voiceLine } from "@/lib/ui/narrator-voice";
 
 interface DossierViewProps {
@@ -45,17 +47,22 @@ export function DossierView({
     profile.assessment_data?.assessment_text ??
     "";
 
-  const archetype =
-    interpretation?.primary_archetype ?? profile.archetype;
-
   const biographyLines = (profile.file_notes ?? [])
     .filter((n) => n.status !== "archived")
     .slice(-3)
     .map((n) => n.text);
 
+  const emerging: EmergingArchetype[] =
+    interpretation?.emerging_archetypes ??
+    (profile.emerging_archetypes ?? []).map((name) => ({
+      name,
+      percentage: profile.archetype_scores?.[name] ?? 30,
+      trend: "growing" as const,
+    }));
+
   return (
     <div className="dossier">
-      <IdentitySection username={profile.username} archetype={archetype} />
+      <IdentitySection username={profile.username} />
 
       {currentRead && (
         <section className="dossier-section dossier-current-read">
@@ -69,6 +76,8 @@ export function DossierView({
       )}
 
       <FileNoticedSection items={fileNoticed} />
+
+      <TraitPipGrid meters={profile.lore_meters} />
 
       {entries && (
         <section className="dossier-section dossier-biography-entries">
@@ -86,13 +95,11 @@ export function DossierView({
         </section>
       )}
 
-      {interpretation && (
-        <EmergingArchetypesSection
-          primary={archetype}
-          secondary={profile.secondary_archetypes ?? []}
-          emerging={interpretation.emerging_archetypes}
-        />
-      )}
+      <ArchetypeSystem
+        profile={profile}
+        emerging={emerging}
+        fileNoticed={fileNoticed}
+      />
 
       <KnownCanonSection
         canon={profile.character_state.canon}

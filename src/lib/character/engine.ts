@@ -52,6 +52,7 @@ import {
   confirmNote,
 } from "./file-notes";
 import { recordTrendData } from "../trends/record";
+import { applyArchetypeMeta } from "../archetypes/reclassification";
 import type { SelectionContext, SelectedContentRow } from "../selection/types";
 import type { ContentType } from "../selection/constants";
 
@@ -173,6 +174,13 @@ export class CharacterEngine {
       apiKey,
     });
 
+    const archetypeState = applyArchetypeMeta(
+      player.character_state,
+      player.archetype,
+      archetypes.primary,
+      archetypeScores,
+    );
+
     await this.db
       .from("player_profiles")
       .update({
@@ -186,6 +194,7 @@ export class CharacterEngine {
         emerging_archetypes: archetypes.emerging,
         archetype_scores: archetypeScores,
         player_tags: mergeTagSets(playerTags, player.player_tags),
+        character_state: archetypeState,
         last_sync_at: new Date().toISOString(),
       })
       .eq("id", player.id);

@@ -4,17 +4,12 @@ import type { EvidenceBundle } from "@/lib/ui/build-evidence";
 
 interface IdentitySectionProps {
   username: string;
-  archetype: string;
 }
 
-export function IdentitySection({
-  username,
-  archetype,
-}: IdentitySectionProps) {
+export function IdentitySection({ username }: IdentitySectionProps) {
   return (
     <section className="dossier-section dossier-identity">
       <h1 className="dossier-username">{username}</h1>
-      <p className="dossier-archetype">{archetype}</p>
     </section>
   );
 }

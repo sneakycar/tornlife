@@ -34,6 +34,11 @@ export interface CanonState {
 
 export interface CharacterState {
   archetype: string;
+  archetype_meta?: {
+    observed_since?: string;
+    previous_archetype?: string;
+    reclassified_at?: string;
+  };
   tone: CharacterTone;
   identity_notes: string[];
   calibration_notes: string[];
