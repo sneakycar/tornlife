@@ -22,9 +22,9 @@ export function RealCharacterPanel({ facts }: RealCharacterPanelProps) {
       : facts.status_label || facts.status;
 
   return (
-    <section className="real-panel">
-      <h2 className="panel-label">Reality</h2>
-      <div className="fact-grid">
+    <section className="dossier-section dossier-reality real-panel">
+      <h2 className="dossier-heading">Reality</h2>
+      <div className="fact-grid compact">
         <FactRow label="Username" value={facts.username} />
         <FactRow label="Level" value={String(facts.level)} />
         <FactRow label="Rank" value={facts.rank} />
@@ -33,22 +33,11 @@ export function RealCharacterPanel({ facts }: RealCharacterPanelProps) {
           value={facts.net_worth != null ? formatMoney(facts.net_worth) : null}
         />
         <FactRow label="Faction" value={facts.faction} />
-        <FactRow label="Position" value={facts.faction_position} />
         <FactRow label="Company" value={facts.company} />
         <FactRow label="Job" value={facts.job_position} />
-        <FactRow label="Education" value={facts.education} />
         <FactRow label="Property" value={facts.property} />
-        <FactRow
-          label="Life"
-          value={
-            facts.life_current != null
-              ? `${facts.life_current}${facts.life_max ? ` / ${facts.life_max}` : ""}`
-              : null
-          }
-        />
         <FactRow label="Status" value={status} />
-        <FactRow label="Travel" value={facts.travel} />
-        {facts.crimes != null && facts.crimes > 0 && (
+        {facts.crimes != null && (
           <FactRow label="Crimes" value={facts.crimes.toLocaleString()} />
         )}
       </div>

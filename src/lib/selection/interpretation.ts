@@ -63,8 +63,8 @@ export function buildInterpretationState(
       field: fc.field,
       title: fc.title,
       fact_line: fc.fact_line,
-      interpretation: interp?.displayText ?? "Change noted. Interpretation pending.",
-      reasoning: "Selected from approved record.",
+      interpretation: interp?.displayText ?? "Still being watched.",
+      reasoning: fc.fact_line,
       confidence: interp ? 0.75 : 0.4,
     };
   });
@@ -83,11 +83,14 @@ export function buildInterpretationState(
       selections.assessmentLine?.displayText ??
       profile.assessment_data?.assessment_text ??
       "",
-    emerging_archetypes: (profile.emerging_archetypes ?? []).map((name) => ({
-      name,
-      percentage: profile.archetype_scores?.[name] ?? 30,
-      trend: "stable" as const,
-    })),
+    emerging_archetypes: (profile.emerging_archetypes ?? []).map((name) => {
+      const score = profile.archetype_scores?.[name] ?? 30;
+      return {
+        name,
+        percentage: score,
+        trend: score >= 35 && score < 58 ? ("growing" as const) : ("stable" as const),
+      };
+    }),
     stat_interpretations: statInterpretations,
     what_changed: whatChanged,
     discoveries: (selections.discoveries ?? []).map((d) => d.displayText),
@@ -118,8 +121,8 @@ function buildStatInterpretations(
       key: stat.key,
       label: stat.label,
       fact: stat.fact,
-      interpretation: match?.displayText ?? "On record.",
-      reasoning: "Selected from approved record.",
+      interpretation: match?.displayText ?? "Noted.",
+      reasoning: stat.fact,
       confidence: match ? 0.7 : 0.35,
     };
   });

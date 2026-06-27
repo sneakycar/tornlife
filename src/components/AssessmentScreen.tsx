@@ -1,15 +1,10 @@
 "use client";
 
-import type { LoreMeterKey, PlayerProfile } from "@/lib/db/types";
+import type { PlayerProfile } from "@/lib/db/types";
 import { QUICK_CORRECTIONS } from "@/lib/db/types";
-import { LoreMeter } from "./LoreMeter";
-import { InterpretationPanel } from "./InterpretationPanel";
-import { RealCharacterPanel } from "./RealCharacterPanel";
+import { DossierView } from "./dossier/DossierView";
 import { useState } from "react";
-
-const METER_ORDER: LoreMeterKey[] = [
-  "heat", "luck", "rot", "rep", "vice", "debt",
-];
+import { voiceLine } from "@/lib/ui/narrator-voice";
 
 interface AssessmentScreenProps {
   profile: PlayerProfile;
@@ -61,59 +56,23 @@ export function AssessmentScreen({
 
   return (
     <div className="assessment">
-      {profile.interpretation_state && (
-        <InterpretationPanel
-          profile={profile}
-          interpretation={profile.interpretation_state}
-        />
-      )}
+      <DossierView
+        profile={profile}
+        interpretation={profile.interpretation_state}
+        facts={profile.character_facts}
+      />
 
-      {profile.character_facts && (
-        <RealCharacterPanel facts={profile.character_facts} />
-      )}
+      <section className="dossier-section dossier-assessment-detail">
+        <h2 className="dossier-heading">File Notes</h2>
+        <p className="assessment-text">{voiceLine(assessment.assessment_text)}</p>
 
-      <section className="assessment-body">
-        <h2 className="dossier-label">Assessment:</h2>
-        <p className="assessment-text">{assessment.assessment_text}</p>
-
-        <h2 className="dossier-label">Traits:</h2>
-        <ul className="dossier-list">
-          {assessment.traits.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
-
-        <h2 className="dossier-label">Habits:</h2>
-        <ul className="dossier-list">
-          {assessment.habits.map((h) => (
-            <li key={h}>{h}</li>
-          ))}
-        </ul>
-
-        <h2 className="dossier-label">Vices:</h2>
-        <ul className="dossier-list">
-          {assessment.vices.map((v) => (
-            <li key={v}>{v}</li>
-          ))}
-        </ul>
-
-        {assessment.fears.length > 0 && (
-          <>
-            <h2 className="dossier-label">Fears:</h2>
-            <ul className="dossier-list">
-              {assessment.fears.map((f) => (
-                <li key={f}>{f}</li>
-              ))}
-            </ul>
-          </>
+        {assessment.traits.length > 0 && (
+          <ul className="dossier-detail-list">
+            {assessment.traits.map((t) => (
+              <li key={t}>{voiceLine(t)}</li>
+            ))}
+          </ul>
         )}
-
-        <h2 className="dossier-label">Meters:</h2>
-        <div className="lore-meters assessment-meters">
-          {METER_ORDER.map((key) => (
-            <LoreMeter key={key} name={key} value={profile.lore_meters[key]} />
-          ))}
-        </div>
       </section>
 
       <section className="calibration-section">

@@ -570,6 +570,336 @@ body {
   margin: 0 0 0.75rem;
 }
 
+/* ─── Dossier hierarchy ─── */
+
+.dossier {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dossier-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.dossier-section:last-child {
+  border-bottom: none;
+}
+
+.dossier-heading {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 1rem;
+}
+
+.dossier-identity {
+  border-bottom: 1px solid var(--border-dim);
+  padding-bottom: 1.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.dossier-username {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  color: var(--text-bright);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.dossier-archetype {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 1.05rem;
+  letter-spacing: 0.28em;
+  color: var(--accent-rust);
+  margin: 0.85rem 0 0;
+  text-transform: uppercase;
+}
+
+.dossier-current-state {
+  color: var(--text-bright);
+  font-size: 1.2rem;
+  line-height: 1.55;
+  margin: 1.25rem 0 0;
+  max-width: 36ch;
+}
+
+.evidence-toggle {
+  margin-top: 1.25rem;
+}
+
+.evidence-panel {
+  margin-top: 1rem;
+  padding: 0.85rem 0 0;
+  border-top: 1px dashed var(--border-dim);
+}
+
+.evidence-list {
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+
+.evidence-list li {
+  margin-bottom: 0.35rem;
+}
+
+.evidence-confidence {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  margin: 0.75rem 0 0;
+  text-transform: uppercase;
+}
+
+.dossier-memory {
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: none;
+}
+
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem 1.25rem;
+}
+
+.memory-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.memory-value {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 1.1rem;
+  color: var(--text-bright);
+  letter-spacing: 0.06em;
+}
+
+.memory-label {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.dossier-meters {
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.dossier-meter-strip {
+  gap: 0.65rem;
+}
+
+.lore-meter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.lore-meter-descriptor {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.dossier-evolution-item {
+  margin-bottom: 1.35rem;
+}
+
+.dossier-evolution-item:last-child {
+  margin-bottom: 0;
+}
+
+.evolution-headline {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-rust);
+  margin: 0 0 0.45rem;
+}
+
+.evolution-body {
+  margin: 0;
+  color: var(--text-bright);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 42ch;
+}
+
+.evolution-archetype {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.95rem;
+}
+
+.discovery-item {
+  margin-bottom: 1.25rem;
+}
+
+.discovery-item:last-child {
+  margin-bottom: 0;
+}
+
+.discovery-label {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #c9a227;
+  opacity: 0.75;
+  margin: 0 0 0.35rem;
+}
+
+.discovery-text {
+  margin: 0;
+  color: var(--text-bright);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 42ch;
+}
+
+.canon-facts-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.canon-facts-list li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+  color: var(--text-bright);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.canon-check {
+  color: #6b8f5e;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.archetype-primary-block {
+  margin-bottom: 1rem;
+}
+
+.archetype-role-label {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 0.35rem;
+}
+
+.archetype-primary-name {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.2em;
+  color: var(--accent-rust);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.archetype-emerging-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.archetype-emerging-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.archetype-emerging-name {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: var(--text-primary);
+}
+
+.archetype-trend {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.archetype-trend.growing {
+  color: #6b8f5e;
+}
+
+.archetype-secondary-names {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  opacity: 0.85;
+}
+
+.dossier-reality {
+  opacity: 0.72;
+  margin-bottom: 1.5rem;
+}
+
+.dossier-reality .fact-grid.compact {
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem 1rem;
+}
+
+.dossier-reality .fact-value {
+  font-size: 0.88rem;
+}
+
+.dossier-logbook {
+  opacity: 0.9;
+  margin-top: 0.5rem;
+}
+
+.dossier-sync-status {
+  margin: -1rem 0 1.5rem;
+}
+
+.dossier-assessment-detail {
+  margin-top: 0;
+}
+
+.dossier-detail-list {
+  margin: 0.75rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+}
+
+.tornlife-content {
+  padding-bottom: 3.5rem;
+}
+
+
 .interpretation-panel {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;

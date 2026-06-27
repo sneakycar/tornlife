@@ -1,7 +1,5 @@
 import type { PlayerProfile } from "@/lib/db/types";
-import { InterpretationPanel } from "./InterpretationPanel";
-import { RealCharacterPanel } from "./RealCharacterPanel";
-import { WhatChangedSection } from "./WhatChangedSection";
+import { DossierView } from "./dossier/DossierView";
 import { Logbook } from "./Logbook";
 import type { LifeEntry } from "@/lib/db/types";
 
@@ -26,29 +24,22 @@ export function GroundedHome({
   onUnpin,
   feedbackBusy,
 }: GroundedHomeProps) {
-  const interpretation = profile.interpretation_state;
-  const facts = profile.character_facts;
-
   return (
     <>
-      {interpretation && (
-        <WhatChangedSection changes={interpretation.what_changed} />
-      )}
-
-      {interpretation && (
-        <InterpretationPanel profile={profile} interpretation={interpretation} />
-      )}
-
-      {facts && <RealCharacterPanel facts={facts} />}
+      <DossierView
+        profile={profile}
+        interpretation={profile.interpretation_state}
+        facts={profile.character_facts}
+      />
 
       {syncing && (
-        <p className="status-whisper" aria-live="polite">
+        <p className="status-whisper dossier-sync-status" aria-live="polite">
           Looking for changes...
         </p>
       )}
 
-      <div className="logbook-section">
-        <h2 className="panel-label">Life Log</h2>
+      <div className="logbook-section dossier-logbook">
+        <h2 className="dossier-heading">Life Log</h2>
         <Logbook
           entries={entries}
           newEntryIds={newEntryIds}

@@ -1,6 +1,7 @@
 "use client";
 
 import type { LoreMeterKey } from "@/lib/db/types";
+import { describeMeter } from "@/lib/ui/meter-descriptor";
 
 const METER_COLORS: Record<LoreMeterKey, string> = {
   heat: "#c44b37",
@@ -23,15 +24,22 @@ const METER_LABELS: Record<LoreMeterKey, string> = {
 interface LoreMeterProps {
   name: LoreMeterKey;
   value: number;
+  showDescriptor?: boolean;
 }
 
-export function LoreMeter({ name, value }: LoreMeterProps) {
+export function LoreMeter({ name, value, showDescriptor = false }: LoreMeterProps) {
   const clamped = Math.max(0, Math.min(100, value));
+  const descriptor = describeMeter(name, clamped);
 
   return (
     <div className="lore-meter">
-      <div className="lore-meter-label" style={{ color: METER_COLORS[name] }}>
-        {METER_LABELS[name]}
+      <div className="lore-meter-header">
+        <div className="lore-meter-label" style={{ color: METER_COLORS[name] }}>
+          {METER_LABELS[name]}
+        </div>
+        {showDescriptor && (
+          <div className="lore-meter-descriptor">{descriptor}</div>
+        )}
       </div>
       <div className="lore-meter-track">
         <div
