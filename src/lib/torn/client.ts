@@ -2,15 +2,6 @@ import type { TornUserResponse } from "./types";
 
 const TORN_API_BASE = "https://api.torn.com";
 
-const USER_SELECTIONS = [
-  "profile",
-  "job",
-  "education",
-  "faction",
-  "travel",
-  "personalstats",
-].join(",");
-
 export class TornApiError extends Error {
   constructor(
     message: string,
@@ -21,9 +12,55 @@ export class TornApiError extends Error {
   }
 }
 
-export async function fetchTornUser(apiKey: string): Promise<TornUserResponse> {
-  const url = new URL(`${TORN_API_BASE}/user/`);
-  url.searchParams.set("selections", USER_SELECTIONS);
+interface V2ProfileResponse {
+  profile?: {
+    id: number;
+    name: string;
+    level: number;
+    age: number;
+    rank: string;
+    title: string;
+    married?: string;
+    property?: { name: string };
+    status?: {
+      description: string;
+      state: string;
+      until: number | null;
+      color?: string;
+    };
+  };
+  error?: { code: number; error: string };
+}
+
+interface V2JobResponse {
+  job?: {
+    type: string;
+    id: number;
+    type_id: number;
+    name: string;
+    position: string;
+    days_in_company: number;
+  };
+  error?: { code: number; error: string };
+}
+
+interface V2FactionResponse {
+  faction?: {
+    id: number;
+    name: string;
+    position: string;
+    days_in_faction: number;
+  };
+  error?: { code: number; error: string };
+}
+
+interface V1PersonalStatsResponse {
+  personalstats?: Record<string, number | string>;
+  error?: { code: number; error: string };
+}
+
+async function tornGet<T>(path: string, apiKey: string): Promise<T> {
+  const url = new URL(`${TORN_API_BASE}${path}`);
   url.searchParams.set("key", apiKey);
   url.searchParams.set("comment", "TORNLIFE");
 
@@ -36,15 +73,85 @@ export async function fetchTornUser(apiKey: string): Promise<TornUserResponse> {
     throw new TornApiError(`Torn API HTTP ${response.status}`, response.status);
   }
 
-  const data = (await response.json()) as TornUserResponse;
+  const data = (await response.json()) as T & { error?: { code: number; error: string } };
 
   if (data.error) {
     throw new TornApiError(data.error.error, data.error.code);
   }
 
-  if (!data.profile?.name) {
+  return data;
+}
+
+function mergeTornResponse(
+  profileRes: V2ProfileResponse,
+  statsRes: V1PersonalStatsResponse,
+  jobRes: V2JobResponse,
+  factionRes: V2FactionResponse,
+): TornUserResponse {
+  const p = profileRes.profile!;
+
+  return {
+    player_id: p.id,
+    name: p.name,
+    profile: {
+      id: p.id,
+      name: p.name,
+      level: p.level,
+      gender: "",
+      status: {
+        description: p.status?.description ?? "Okay",
+        state: p.status?.state ?? "Okay",
+        until: p.status?.until ?? 0,
+      },
+      role: "",
+      age: p.age,
+      married: p.married ?? "Single",
+      property: p.property?.name ?? "Shack",
+      donator: 0,
+      awards: 0,
+      merits: 0,
+      rank: p.rank,
+      sign: p.title,
+      competition: null,
+    },
+    status: {
+      description: p.status?.description ?? "Okay",
+      state: p.status?.state ?? "Okay",
+      until: p.status?.until ?? 0,
+      color: p.status?.color ?? "green",
+    },
+    job: jobRes.job
+      ? {
+          job: "Employee",
+          position: jobRes.job.position,
+          company_id: jobRes.job.id,
+          company_name: jobRes.job.name,
+          company_type: jobRes.job.type_id,
+        }
+      : undefined,
+    faction: factionRes.faction
+      ? {
+          faction_id: factionRes.faction.id,
+          faction_name: factionRes.faction.name,
+          position: factionRes.faction.position,
+          days_in_faction: factionRes.faction.days_in_faction,
+        }
+      : undefined,
+    personalstats: statsRes.personalstats,
+  };
+}
+
+export async function fetchTornUser(apiKey: string): Promise<TornUserResponse> {
+  const [profileRes, statsRes, jobRes, factionRes] = await Promise.all([
+    tornGet<V2ProfileResponse>("/v2/user/profile", apiKey),
+    tornGet<V1PersonalStatsResponse>("/user/?selections=personalstats", apiKey),
+    tornGet<V2JobResponse>("/v2/user/job", apiKey),
+    tornGet<V2FactionResponse>("/v2/user/faction", apiKey),
+  ]);
+
+  if (!profileRes.profile?.name) {
     throw new TornApiError("Torn API returned no profile data");
   }
 
-  return data;
+  return mergeTornResponse(profileRes, statsRes, jobRes, factionRes);
 }
