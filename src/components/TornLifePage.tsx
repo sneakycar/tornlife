@@ -3,9 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { LifeEntry, PlayerProfile } from "@/lib/db/types";
 import { AssessmentScreen } from "@/components/AssessmentScreen";
-import { CharacterHeader } from "@/components/CharacterHeader";
+import { GroundedHome } from "@/components/GroundedHome";
 import { IndustrialBackground } from "@/components/IndustrialBackground";
-import { Logbook } from "@/components/Logbook";
 
 interface LifeData {
   profile: PlayerProfile;
@@ -227,22 +226,16 @@ export function TornLifePage() {
         )}
 
         {data && locked && (
-          <>
-            <CharacterHeader profile={data.profile} />
-            {syncing && (
-              <p className="status-whisper" aria-live="polite">
-                Listening...
-              </p>
-            )}
-            <Logbook
-              entries={data.entries}
-              newEntryIds={newEntryIds}
-              onFeedback={handleEntryFeedback}
-              onPin={handlePin}
-              onUnpin={handleUnpin}
-              feedbackBusy={busy}
-            />
-          </>
+          <GroundedHome
+            profile={data.profile}
+            entries={data.entries}
+            newEntryIds={newEntryIds}
+            syncing={syncing}
+            onFeedback={handleEntryFeedback}
+            onPin={handlePin}
+            onUnpin={handleUnpin}
+            feedbackBusy={busy}
+          />
         )}
 
         {!data && !error && (

@@ -18,6 +18,14 @@ import {
 import { fetchTornUser } from "../torn/client";
 import { normalizeTornSnapshot } from "../snapshot/normalize";
 import { compareSnapshots } from "../snapshot/compare";
+import { buildFactChanges } from "../snapshot/fact-changes";
+import {
+  generateFullInterpretation,
+  generateSyncInterpretation,
+  mergeInterpretationOnSync,
+  parseInterpretationState,
+} from "../interpretation/engine";
+import type { CharacterFacts } from "../db/types";
 import {
   generateAssessment,
   generateNarrative,
@@ -103,6 +111,11 @@ export class CharacterEngine {
       normalized,
     );
 
+    const factChanges = buildFactChanges(
+      previousSnapshot?.normalized_summary ?? null,
+      normalized,
+    );
+
     await this.db.from("torn_snapshots").insert({
       player_id: player.id,
       raw_data: tornData as Record<string, unknown>,
@@ -115,6 +128,7 @@ export class CharacterEngine {
         username: normalized.username,
         age: normalized.age,
         torn_user_id: normalized.tornUserId,
+        character_facts: normalized.characterFacts,
         last_sync_at: new Date().toISOString(),
       })
       .eq("id", player.id);
@@ -134,6 +148,11 @@ export class CharacterEngine {
 
     if (!player.character_locked) {
       return { profile: player, newEntries: [], generated: false, trigger: null };
+    }
+
+    if (factChanges.length > 0 || !player.interpretation_state) {
+      await this.updateInterpretation(player, normalized, factChanges);
+      player = await this.getPlayerById(player.id);
     }
 
     const recentEntries = await this.getRecentEntryTexts(player.id, 5);
@@ -193,6 +212,14 @@ export class CharacterEngine {
       { calibration_notes: notes.map((n) => n.value) },
     );
 
+    const { output: interpretation, tokensUsed: interpTokens } =
+      await generateFullInterpretation({
+        facts: snapshot.normalized_summary.characterFacts,
+        username: player.username,
+        characterState,
+        calibrationNotes: notes.map((n) => n.value),
+      });
+
     await this.db
       .from("player_profiles")
       .update({
@@ -201,6 +228,8 @@ export class CharacterEngine {
         lore_meters: output.meters,
         assessment_data: assessmentData,
         character_state: characterState,
+        interpretation_state: interpretation,
+        character_facts: snapshot.normalized_summary.characterFacts,
         calibration_notes: notes,
         assessment_version: player.assessment_version + 1,
         initialized: true,
@@ -212,7 +241,7 @@ export class CharacterEngine {
       trigger_type: "assessment",
       input_summary: { correction: correction?.value ?? "regenerate" },
       output_summary: { archetype: output.archetype },
-      tokens_used: tokensUsed,
+      tokens_used: (tokensUsed ?? 0) + (interpTokens ?? 0),
       success: true,
     });
 
@@ -518,6 +547,14 @@ export class CharacterEngine {
       calibrationNotes: player.calibration_notes,
     });
 
+    const { output: interpretation, tokensUsed: interpTokens } =
+      await generateFullInterpretation({
+        facts: summary.characterFacts,
+        username: player.username,
+        characterState: output.character_state,
+        calibrationNotes: player.calibration_notes.map((n) => n.value),
+      });
+
     await this.db
       .from("player_profiles")
       .update({
@@ -526,6 +563,8 @@ export class CharacterEngine {
         lore_meters: output.meters,
         assessment_data: assessmentToData(output),
         character_state: output.character_state,
+        interpretation_state: interpretation,
+        character_facts: summary.characterFacts,
         initialized: true,
       })
       .eq("id", player.id);
@@ -535,6 +574,43 @@ export class CharacterEngine {
       trigger_type: "assessment",
       input_summary: { firstRun: true },
       output_summary: { archetype: output.archetype },
+      tokens_used: (tokensUsed ?? 0) + (interpTokens ?? 0),
+      success: true,
+    });
+  }
+
+  private async updateInterpretation(
+    player: PlayerProfile,
+    summary: TornSnapshot["normalized_summary"],
+    factChanges: ReturnType<typeof buildFactChanges>,
+  ): Promise<void> {
+    const { output, tokensUsed } = await generateSyncInterpretation({
+      facts: summary.characterFacts,
+      username: player.username,
+      characterState: player.character_state,
+      factChanges,
+      previousInterpretation: player.interpretation_state,
+    });
+
+    const merged = mergeInterpretationOnSync(
+      player.interpretation_state,
+      output,
+      factChanges,
+    );
+
+    await this.db
+      .from("player_profiles")
+      .update({
+        archetype: merged.primary_archetype,
+        interpretation_state: merged,
+      })
+      .eq("id", player.id);
+
+    await this.db.from("generation_runs").insert({
+      player_id: player.id,
+      trigger_type: "feedback",
+      input_summary: { factChangeCount: factChanges.length },
+      output_summary: { archetype: merged.primary_archetype },
       tokens_used: tokensUsed,
       success: true,
     });
@@ -703,6 +779,8 @@ export class CharacterEngine {
       lore_meters: parseLoreMeters(row.lore_meters),
       character_state: parseCharacterState(row.character_state),
       assessment_data: parseAssessmentData(row.assessment_data),
+      character_facts: parseCharacterFacts(row.character_facts),
+      interpretation_state: parseInterpretationState(row.interpretation_state),
       character_locked: (row.character_locked as boolean) ?? false,
       calibration_notes: parseCalibrationNotes(row.calibration_notes),
       assessment_version: (row.assessment_version as number) ?? 1,
@@ -713,6 +791,13 @@ export class CharacterEngine {
       updated_at: row.updated_at as string,
     };
   }
+}
+
+function parseCharacterFacts(raw: unknown): CharacterFacts | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as CharacterFacts;
+  if (!r.username) return null;
+  return r;
 }
 
 let engine: CharacterEngine | null = null;

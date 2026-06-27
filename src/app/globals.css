@@ -173,12 +173,14 @@ body {
   position: relative;
   z-index: 1;
   height: 100%;
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto;
   padding: 2rem 1.5rem 1rem;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-dim) transparent;
 }
 
 /* ─── Character Header ─── */
@@ -555,5 +557,223 @@ body {
   color: #c9a227;
   opacity: 0.6;
   margin-left: 0.5rem;
+}
+
+/* ─── Grounded character panels ─── */
+
+.panel-label {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 0.75rem;
+}
+
+.interpretation-panel {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.interp-identity {
+  margin-bottom: 1.25rem;
+}
+
+.interp-archetype.primary {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  color: var(--accent-rust);
+  margin: 0.5rem 0;
+}
+
+.interp-summary {
+  color: var(--text-bright);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0.75rem 0 0;
+}
+
+.emerging-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.emerging-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  margin-bottom: 0.35rem;
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+.emerging-name {
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.emerging-pct {
+  color: var(--text-bright);
+}
+
+.emerging-trend {
+  color: var(--text-dim);
+  text-transform: uppercase;
+  font-size: 0.55rem;
+}
+
+.emerging-trend.growing {
+  color: #6b8f5e;
+}
+
+.interp-meters {
+  margin: 1rem 0 1.5rem;
+}
+
+.narrator-text {
+  color: var(--text-bright);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.real-panel {
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border-dim);
+  border-bottom: 1px solid var(--border-dim);
+  opacity: 0.85;
+}
+
+.fact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem 1rem;
+}
+
+.fact-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.fact-label {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.fact-value {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.what-changed {
+  margin-bottom: 1.5rem;
+}
+
+.change-item {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.change-title {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--accent-rust);
+  margin: 0 0 0.35rem;
+}
+
+.change-fact {
+  font-size: 0.9rem;
+  color: var(--text-bright);
+  margin: 0 0 0.5rem;
+}
+
+.change-interp {
+  margin: 0 0 0.5rem;
+  line-height: 1.55;
+}
+
+.narrator-tag {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+
+.stat-interpretation {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.stat-interpretation-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.stat-label {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.stat-fact {
+  font-size: 0.85rem;
+  color: var(--text-bright);
+  text-align: right;
+}
+
+.stat-interp {
+  margin: 0 0 0.35rem;
+  line-height: 1.55;
+  font-size: 0.98rem;
+}
+
+.why-btn {
+  margin-top: 0.25rem;
+}
+
+.why-panel {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0 0;
+  border-top: 1px dashed var(--border-dim);
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+.confidence {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  margin: 0.35rem 0 0;
+  color: var(--text-dim);
+}
+
+.discoveries li {
+  color: #c9a227;
+  opacity: 0.85;
+}
+
+.logbook-section {
+  margin-top: 1.5rem;
+  flex: 1;
+}
+
+.logbook-section .logbook {
+  max-height: none;
 }
 

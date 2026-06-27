@@ -1,5 +1,6 @@
 import type { TornUserResponse } from "../torn/types";
 import type { ActivitySignal, NormalizedSummary } from "../db/types";
+import { extractCharacterFacts } from "./facts";
 
 const STATUS_LABELS: Record<string, string> = {
   Okay: "moving through the city",
@@ -106,6 +107,7 @@ export function normalizeTornSnapshot(data: TornUserResponse): NormalizedSummary
   const status = profile.status;
 
   const comparisonKeys: NormalizedSummary["comparisonKeys"] = {
+    level: profile.level,
     statusState: status.state,
     statusUntil: status.until,
     job: data.job?.job ?? "None",
@@ -134,10 +136,14 @@ export function normalizeTornSnapshot(data: TornUserResponse): NormalizedSummary
     fraud: (data.personalstats?.fraud as number) ?? 0,
   };
 
+  const characterFacts = extractCharacterFacts(data);
+
   return {
     tornUserId: profile.id,
     username: profile.name,
     age: profile.age,
+    level: profile.level,
+    rank: `${profile.rank} ${profile.sign}`.trim(),
     status: status.state,
     statusDescription: describeStatus(status.state, status.description),
     location: data.travel?.destination ?? profile.property ?? null,
@@ -148,6 +154,7 @@ export function normalizeTornSnapshot(data: TornUserResponse): NormalizedSummary
         : null,
     faction: data.faction?.faction_name ?? null,
     maritalStatus: profile.married,
+    characterFacts,
     activitySignals: extractActivitySignals(data),
     comparisonKeys,
   };

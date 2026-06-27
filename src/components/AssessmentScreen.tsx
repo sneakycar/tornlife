@@ -3,6 +3,8 @@
 import type { LoreMeterKey, PlayerProfile } from "@/lib/db/types";
 import { QUICK_CORRECTIONS } from "@/lib/db/types";
 import { LoreMeter } from "./LoreMeter";
+import { InterpretationPanel } from "./InterpretationPanel";
+import { RealCharacterPanel } from "./RealCharacterPanel";
 import { useState } from "react";
 
 const METER_ORDER: LoreMeterKey[] = [
@@ -59,13 +61,16 @@ export function AssessmentScreen({
 
   return (
     <div className="assessment">
-      <header className="assessment-header">
-        <h1 className="character-username">{profile.username}</h1>
-        {profile.age !== null && (
-          <p className="character-age">Age {profile.age}</p>
-        )}
-        <p className="character-archetype">{profile.archetype}</p>
-      </header>
+      {profile.interpretation_state && (
+        <InterpretationPanel
+          profile={profile}
+          interpretation={profile.interpretation_state}
+        />
+      )}
+
+      {profile.character_facts && (
+        <RealCharacterPanel facts={profile.character_facts} />
+      )}
 
       <section className="assessment-body">
         <h2 className="dossier-label">Assessment:</h2>

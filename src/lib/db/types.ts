@@ -47,6 +47,80 @@ export interface CharacterState {
   last_updated: string;
 }
 
+export interface CharacterFacts {
+  username: string;
+  level: number;
+  rank: string;
+  age: number;
+  net_worth: number | null;
+  money_on_hand: number | null;
+  faction: string | null;
+  faction_position: string | null;
+  company: string | null;
+  job_position: string | null;
+  education: string | null;
+  property: string;
+  life_current: number | null;
+  life_max: number | null;
+  status: string;
+  status_label: string;
+  travel: string | null;
+  crimes: number | null;
+  hospitalizations: number | null;
+  jailed: number | null;
+  attacks_won: number | null;
+  travel_times: number | null;
+  donations: number | null;
+  drugs: number | null;
+  alcohol_used: number | null;
+}
+
+export interface StatInterpretation {
+  key: string;
+  label: string;
+  fact: string;
+  interpretation: string;
+  reasoning: string;
+  confidence: number;
+}
+
+export interface EmergingArchetype {
+  name: string;
+  percentage: number;
+  trend: "growing" | "stable" | "fading";
+}
+
+export interface InterpretedChange {
+  field: string;
+  title: string;
+  fact_line: string;
+  interpretation: string;
+  reasoning: string;
+  confidence: number;
+}
+
+export interface InterpretationState {
+  primary_archetype: string;
+  character_state_summary: string;
+  narrator_assessment: string;
+  emerging_archetypes: EmergingArchetype[];
+  stat_interpretations: StatInterpretation[];
+  what_changed: InterpretedChange[];
+  discoveries: string[];
+  recent_observations: string[];
+}
+
+export const DEFAULT_INTERPRETATION_STATE: InterpretationState = {
+  primary_archetype: "THE UNKNOWN",
+  character_state_summary: "",
+  narrator_assessment: "",
+  emerging_archetypes: [],
+  stat_interpretations: [],
+  what_changed: [],
+  discoveries: [],
+  recent_observations: [],
+};
+
 export interface AssessmentData {
   assessment_text: string;
   traits: string[];
@@ -94,6 +168,8 @@ export interface PlayerProfile {
   lore_meters: LoreMeters;
   character_state: CharacterState;
   assessment_data: AssessmentData | null;
+  character_facts: CharacterFacts | null;
+  interpretation_state: InterpretationState | null;
   character_locked: boolean;
   calibration_notes: CalibrationNote[];
   assessment_version: number;
@@ -155,6 +231,8 @@ export interface NormalizedSummary {
   tornUserId: number;
   username: string;
   age: number;
+  level: number;
+  rank: string;
   status: string;
   statusDescription: string;
   location: string | null;
@@ -162,6 +240,7 @@ export interface NormalizedSummary {
   education: string | null;
   faction: string | null;
   maritalStatus: string | null;
+  characterFacts: CharacterFacts;
   activitySignals: ActivitySignal[];
   comparisonKeys: Record<string, string | number | boolean | null>;
 }

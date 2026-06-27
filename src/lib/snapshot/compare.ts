@@ -13,6 +13,10 @@ export interface ChangeSummary {
 }
 
 const FIELD_LABELS: Record<string, (prev: unknown, next: unknown) => string | null> = {
+  level: (prev, next) => {
+    if (Number(next) <= Number(prev)) return null;
+    return `reached a new level`;
+  },
   statusState: (prev, next) => {
     if (prev === next) return null;
     return `circumstance shifted from ${String(prev).toLowerCase()} to ${String(next).toLowerCase()}`;
@@ -138,7 +142,8 @@ const SIGNIFICANCE: Record<string, number> = {
   alcoholused: 3,
   itemsbought: 3,
   traveltimes: 3,
-  networth: 2,
+  level: 4,
+  networth: 7,
   moneyonhand: 2,
 };
 

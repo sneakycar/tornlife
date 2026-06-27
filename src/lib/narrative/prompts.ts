@@ -23,8 +23,12 @@ Bad: "Donated $1,000,000." Good: "Spent twenty minutes pretending morality was a
 Bad: "Hospitalized." Good: "Ate soup through the wrong side of his mouth."
 Bad: "Won another race." Good: "Took the long way home just because he could."
 
-NEVER mention: stats, percentages, levels, net worth, battle stats, API data, Torn mechanics, achievements, or game terminology.
 NEVER use the username as a nickname — refer to him as "he" or by implication.
+
+GROUNDING:
+- Torn statistics are EVIDENCE, not secrets. Show real facts, then interpret them.
+- Every important stat should have: fact (real number) + interpretation + reasoning + confidence.
+- FACT → INTERPRETATION → CHARACTER DEVELOPMENT
 `.trim();
 
 export function buildAssessmentPrompt(
