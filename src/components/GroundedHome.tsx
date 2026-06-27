@@ -43,7 +43,7 @@ export function GroundedHome({
 
       {syncing && (
         <p className="status-whisper" aria-live="polite">
-          Listening...
+          Looking for changes...
         </p>
       )}
 

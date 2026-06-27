@@ -1,3 +1,4 @@
+// Offline content factory only — not used by the live selection app.
 import { generateObject } from "ai";
 import { openai } from "@ai-sdk/openai";
 import type {

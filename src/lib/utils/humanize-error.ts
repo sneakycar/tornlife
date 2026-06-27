@@ -1,16 +1,16 @@
 export function humanizeError(message: string): string {
   const lower = message.toLowerCase();
 
-  if (lower.includes("quota") || lower.includes("billing")) {
-    return "The narrator's line is dead. OpenAI account has no quota — add billing at platform.openai.com, then reload.";
+  if (lower.includes("content_seeds") || lower.includes("seed query")) {
+    return "The content library is unavailable. Approved records may not be loaded yet.";
   }
 
-  if (lower.includes("invalid api key") || lower.includes("incorrect api key")) {
-    return "The narrator's line is dead. OPENAI_API_KEY is invalid.";
+  if (lower.includes("my_torn_api_key")) {
+    return "Torn API key is not configured on the server.";
   }
 
   if (lower.includes("rate limit")) {
-    return "The narrator is throttled. Wait a minute and try again.";
+    return "Too many requests. Wait a minute and try again.";
   }
 
   if (message.length > 200) {

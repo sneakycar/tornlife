@@ -52,7 +52,7 @@ export function AssessmentScreen({
           </>
         ) : (
           <p className="status-whisper">
-            {syncing ? "Reading the file..." : "Waiting on the narrator..."}
+            {syncing ? "Checking the record..." : "Reviewing the file..."}
           </p>
         )}
       </div>
@@ -117,7 +117,7 @@ export function AssessmentScreen({
       </section>
 
       <section className="calibration-section">
-        <p className="calibration-prompt">Correct the narrator.</p>
+        <p className="calibration-prompt">Adjust the record.</p>
 
         <div className="correction-buttons">
           {QUICK_CORRECTIONS.map((label) => (

@@ -777,3 +777,118 @@ body {
   max-height: none;
 }
 
+/* ─── Engine debug (MVP prototype) ─── */
+
+.engine-debug {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.engine-debug-toolbar {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(8, 9, 8, 0.92);
+  border-top: 1px solid var(--border-dim);
+  pointer-events: auto;
+}
+
+.engine-debug-error {
+  margin: 0;
+  padding: 0.35rem 0.75rem;
+  background: #2a1515;
+  color: #c96;
+  font-size: 0.85rem;
+  pointer-events: auto;
+}
+
+.engine-debug-panel {
+  max-height: 45vh;
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem 1rem;
+  background: rgba(10, 11, 13, 0.97);
+  border-top: 1px solid var(--border-dim);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  pointer-events: auto;
+}
+
+.engine-debug-section {
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--border-dim);
+  padding: 0.35rem 0.5rem;
+}
+
+.engine-debug-section summary {
+  cursor: pointer;
+  color: var(--text-bright);
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.engine-debug-row {
+  margin: 0.2rem 0;
+}
+
+.engine-debug-label {
+  color: var(--text-dim);
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.engine-debug-pre {
+  margin: 0.35rem 0 0;
+  padding: 0.35rem;
+  background: #0c0e10;
+  border: 1px solid var(--border-dim);
+  font-size: 0.7rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.engine-debug-pre.scroll {
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+.engine-debug-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--text-primary);
+}
+
+.engine-debug-list.compact li {
+  margin-bottom: 0.2rem;
+  opacity: 0.85;
+}
+
+.engine-debug-probe {
+  margin-top: 0.5rem;
+  padding-top: 0.35rem;
+  border-top: 1px dashed var(--border-dim);
+}
+
+.engine-debug-probe-title {
+  margin: 0;
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--text-bright);
+  text-transform: uppercase;
+}
+
+.engine-debug-pick {
+  margin: 0.25rem 0;
+  color: #9ab87a;
+  font-style: italic;
+}
+

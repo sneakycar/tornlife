@@ -132,7 +132,7 @@ export interface AssessmentData {
   tone: CharacterTone;
 }
 
-export type EntryType = "assessment" | "reactive" | "ambient" | "initial";
+export type EntryType = "assessment" | "reactive" | "ambient" | "initial" | "selected";
 
 export type FeedbackStatus =
   | "none"
@@ -150,7 +150,8 @@ export type GenerationTrigger =
   | "assessment"
   | "lock"
   | "rewrite"
-  | "feedback";
+  | "feedback"
+  | "selection";
 
 export type CalibrationNote = {
   type: "quick" | "freeform";
@@ -165,6 +166,13 @@ export interface PlayerProfile {
   civilian_name: string | null;
   age: number | null;
   archetype: string;
+  secondary_archetypes: string[];
+  emerging_archetypes: string[];
+  archetype_scores: Record<string, number>;
+  player_tags: string[];
+  canon_tags: string[];
+  blocked_tags: string[];
+  preferred_tags: string[];
   lore_meters: LoreMeters;
   character_state: CharacterState;
   assessment_data: AssessmentData | null;
@@ -328,7 +336,6 @@ export const QUICK_CORRECTIONS = [
 
 export const ENTRY_FEEDBACK_OPTIONS = [
   "Keep",
-  "Rewrite",
   "Too violent",
   "Too silly",
   "Too edgy",

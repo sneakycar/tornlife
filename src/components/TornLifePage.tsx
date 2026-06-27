@@ -5,6 +5,8 @@ import type { LifeEntry, PlayerProfile } from "@/lib/db/types";
 import { AssessmentScreen } from "@/components/AssessmentScreen";
 import { GroundedHome } from "@/components/GroundedHome";
 import { IndustrialBackground } from "@/components/IndustrialBackground";
+import { EngineDebugPanel } from "@/components/EngineDebugPanel";
+import { showEngineDebugUi } from "@/lib/character/debug-client";
 
 interface LifeData {
   profile: PlayerProfile;
@@ -242,6 +244,14 @@ export function TornLifePage() {
           <p className="status-whisper" aria-live="polite">
             Opening save file...
           </p>
+        )}
+
+        {showEngineDebugUi() && (
+          <EngineDebugPanel
+            onRefresh={async () => {
+              await runSync();
+            }}
+          />
         )}
       </div>
     </main>
