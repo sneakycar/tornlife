@@ -77,6 +77,67 @@ export function EngineDebugPanel({ onRefresh }: EngineDebugPanelProps) {
 
       {open && data && (
         <div className="engine-debug-panel">
+          <Section title="Data Coverage" defaultOpen={false}>
+            <Row label="Overall confidence" value={data.dataCoverage.overall_confidence} />
+            <Row label="History window" value={`${data.dataCoverage.history_window_days} days`} />
+            <Row label="Snapshot tracking" value={`${data.dataCoverage.snapshot_count} snaps / ${data.dataCoverage.snapshot_tracking_days}d`} />
+            <Row label="Sync deltas stored" value={String(data.dataCoverage.sync_delta_count)} />
+            <Row label="User profile" value={data.dataCoverage.user_profile} />
+            <Row label="v1 log" value={data.dataCoverage.v1_log} />
+            {data.dataCoverage.v1_log_reason && (
+              <Row label="v1 log note" value={data.dataCoverage.v1_log_reason} />
+            )}
+            <Row label="v2 events" value={data.dataCoverage.v2_events} />
+            <Row label="Events cached" value={String(data.dataCoverage.v2_events_count)} />
+            <Row label="Events span" value={`${data.dataCoverage.v2_events_span_days}d`} />
+            <Row label="personalstats" value={`${data.dataCoverage.personalstats} (${data.dataCoverage.personalstats_mode})`} />
+            <Row label="Item use" value={data.dataCoverage.item_use} />
+            <Row label="Alcohol use" value={data.dataCoverage.alcohol_use} />
+            <Row label="Medical/drug" value={data.dataCoverage.medical_drug_use} />
+            <Row label="Fights" value={data.dataCoverage.fights} />
+            <Row label="Money movement" value={data.dataCoverage.money_movement} />
+            <Row label="Crimes" value={data.dataCoverage.crimes} />
+            <Row label="Hospital/jail" value={data.dataCoverage.hospital_jail} />
+
+            {data.dataCoverage.unavailable_reasons.length > 0 && (
+              <>
+                <p className="engine-debug-label">Unavailable</p>
+                <ul className="engine-debug-list compact">
+                  {data.dataCoverage.unavailable_reasons.map((r: string) => (
+                    <li key={r}>{r}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            {data.dataCoverage.trend_facts.length > 0 && (
+              <>
+                <p className="engine-debug-label">Trend facts</p>
+                <pre className="engine-debug-pre scroll">
+                  {JSON.stringify(data.dataCoverage.trend_facts, null, 2)}
+                </pre>
+              </>
+            )}
+
+            <p className="engine-debug-label">Lifetime counters (sample)</p>
+            <pre className="engine-debug-pre scroll">
+              {JSON.stringify(
+                Object.fromEntries(
+                  Object.entries(data.dataCoverage.lifetime_counters).filter(
+                    ([, v]) => (v as number) > 0,
+                  ).slice(0, 25),
+                ),
+                null,
+                2,
+              )}
+            </pre>
+
+            <p className="engine-debug-label">7-day sync deltas</p>
+            <pre className="engine-debug-pre">
+              {JSON.stringify(data.dataCoverage.recent_deltas_7d, null, 2)}
+            </pre>
+          </Section>
+
           <Section title="Snapshot">
             <Row label="User" value={`${data.username} (${data.tornUserId ?? "?"})`} />
             <Row label="Snapshot" value={data.snapshotAt ?? "none — use REFRESH TORN"} />
@@ -188,9 +249,17 @@ export function EngineDebugPanel({ onRefresh }: EngineDebugPanelProps) {
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({
+  title,
+  children,
+  defaultOpen = true,
+}: {
+  title: string;
+  children: ReactNode;
+  defaultOpen?: boolean;
+}) {
   return (
-    <details className="engine-debug-section" open>
+    <details className="engine-debug-section" open={defaultOpen}>
       <summary>{title}</summary>
       {children}
     </details>

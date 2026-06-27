@@ -14,6 +14,8 @@ import type { ContentType } from "../selection/constants";
 import type { SelectionContext } from "../selection/types";
 import { getCharacterEngine } from "./engine";
 import type { EngineInspection, SelectionProbe } from "./inspect-types";
+import type { DataCoverageReport } from "../trends/types";
+import { buildDataCoverageReport } from "../trends/coverage";
 
 const PROBE_TYPES: ContentType[] = [
   "character_assessment_line",
@@ -112,6 +114,22 @@ export async function inspectEngine(options?: {
     .eq("approved", true)
     .eq("active", true);
 
+  const apiKey = process.env.MY_TORN_API_KEY;
+  let dataCoverage: DataCoverageReport;
+  if (apiKey) {
+    let tornForCoverage: Awaited<ReturnType<typeof fetchTornUser>> | undefined;
+    if (options?.refreshTorn) {
+      tornForCoverage = await fetchTornUser(apiKey);
+    }
+    dataCoverage = await buildDataCoverageReport(
+      player.id,
+      apiKey,
+      tornForCoverage,
+    );
+  } else {
+    dataCoverage = await buildDataCoverageReport(player.id, "", undefined);
+  }
+
   return {
     inspectedAt: new Date().toISOString(),
     username: player.username,
@@ -146,6 +164,7 @@ export async function inspectEngine(options?: {
       feedbackStatus: h.feedback_status,
     })),
     libraryStats: { approvedSeeds: count ?? 0 },
+    dataCoverage,
   };
 }
 

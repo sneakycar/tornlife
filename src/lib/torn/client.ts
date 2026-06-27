@@ -155,3 +155,109 @@ export async function fetchTornUser(apiKey: string): Promise<TornUserResponse> {
 
   return mergeTornResponse(profileRes, statsRes, jobRes, factionRes);
 }
+
+export interface TornV2Event {
+  id: string;
+  timestamp: number;
+  event: string;
+}
+
+interface V2EventsResponse {
+  events?: TornV2Event[];
+  _metadata?: { links?: { prev?: string | null; next?: string | null } };
+  error?: { code: number; error: string };
+}
+
+/** Paginate v2 events until maxPages or no more history */
+export async function fetchTornEvents(
+  apiKey: string,
+  maxPages = 10,
+): Promise<TornV2Event[]> {
+  let url: string | null =
+    `${TORN_API_BASE}/v2/user/events?key=${encodeURIComponent(apiKey)}&comment=TORNLIFE&limit=100&sort=desc`;
+  const all: TornV2Event[] = [];
+
+  for (let page = 0; page < maxPages && url; page++) {
+    const response = await fetch(url, {
+      next: { revalidate: 0 },
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) {
+      throw new TornApiError(`Torn events HTTP ${response.status}`, response.status);
+    }
+    const data = (await response.json()) as V2EventsResponse;
+    if (data.error) {
+      throw new TornApiError(data.error.error, data.error.code);
+    }
+    all.push(...(data.events ?? []));
+    const prev = data._metadata?.links?.prev;
+    url = prev ? `${prev}&key=${encodeURIComponent(apiKey)}` : null;
+  }
+
+  return all;
+}
+
+export interface TornApiProbe {
+  v1_log_available: boolean;
+  v1_log_error?: string;
+  v2_events_available: boolean;
+  v2_events_count: number;
+  v2_events_oldest: string | null;
+  v2_events_newest: string | null;
+  v2_events_span_days: number;
+  personalstats_available: boolean;
+}
+
+export async function probeTornApiAccess(apiKey: string): Promise<TornApiProbe> {
+  let v1_log_available = false;
+  let v1_log_error: string | undefined;
+  try {
+    await tornGet<{ log?: unknown }>("/user/?selections=log", apiKey);
+    v1_log_available = true;
+  } catch (e) {
+    v1_log_error = e instanceof Error ? e.message : "unavailable";
+  }
+
+  let v2_events_available = false;
+  let v2_events_count = 0;
+  let v2_events_oldest: string | null = null;
+  let v2_events_newest: string | null = null;
+  let v2_events_span_days = 0;
+  try {
+    const events = await fetchTornEvents(apiKey, 10);
+    v2_events_available = events.length > 0;
+    v2_events_count = events.length;
+    if (events.length > 0) {
+      v2_events_newest = new Date(events[0].timestamp * 1000).toISOString();
+      v2_events_oldest = new Date(
+        events[events.length - 1].timestamp * 1000,
+      ).toISOString();
+      v2_events_span_days =
+        (events[0].timestamp - events[events.length - 1].timestamp) / 86400;
+    }
+  } catch {
+    v2_events_available = false;
+  }
+
+  let personalstats_available = false;
+  try {
+    const stats = await tornGet<V1PersonalStatsResponse>(
+      "/user/?selections=personalstats",
+      apiKey,
+    );
+    personalstats_available = !!stats.personalstats;
+  } catch {
+    personalstats_available = false;
+  }
+
+  return {
+    v1_log_available,
+    v1_log_error,
+    v2_events_available,
+    v2_events_count,
+    v2_events_oldest,
+    v2_events_newest,
+    v2_events_span_days,
+    personalstats_available,
+  };
+}

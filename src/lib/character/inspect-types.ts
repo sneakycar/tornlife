@@ -4,6 +4,7 @@ import type { FactChange } from "../snapshot/fact-changes";
 import type { ContentType } from "../selection/constants";
 import type { ArchetypeResult } from "../selection/archetypes";
 import type { SelectionContext } from "../selection/types";
+import type { DataCoverageReport } from "../trends/types";
 
 export interface SelectionProbe {
   contentType: ContentType;
@@ -64,6 +65,8 @@ export interface EngineInspection {
   libraryStats: {
     approvedSeeds: number;
   };
+
+  dataCoverage: DataCoverageReport;
 }
 
 export function isEngineDebugEnabled(): boolean {

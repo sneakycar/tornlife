@@ -51,6 +51,7 @@ import {
   pickNewObservation,
   confirmNote,
 } from "./file-notes";
+import { recordTrendData } from "../trends/record";
 import type { SelectionContext, SelectedContentRow } from "../selection/types";
 import type { ContentType } from "../selection/constants";
 
@@ -150,10 +151,26 @@ export class CharacterEngine {
       archetypes.scores,
     );
 
-    await this.db.from("torn_snapshots").insert({
-      player_id: player.id,
-      raw_data: tornData as Record<string, unknown>,
-      normalized_summary: normalized,
+    const { data: snapRow, error: snapErr } = await this.db
+      .from("torn_snapshots")
+      .insert({
+        player_id: player.id,
+        raw_data: tornData as Record<string, unknown>,
+        normalized_summary: normalized,
+      })
+      .select("id")
+      .single();
+
+    if (snapErr || !snapRow) {
+      throw new Error(snapErr?.message ?? "Failed to store snapshot");
+    }
+
+    await recordTrendData({
+      playerId: player.id,
+      snapshotId: snapRow.id,
+      previousSnapshotId: previousSnapshot?.id ?? null,
+      tornData,
+      apiKey,
     });
 
     await this.db
