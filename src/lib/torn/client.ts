@@ -9,7 +9,6 @@ const USER_SELECTIONS = [
   "faction",
   "travel",
   "personalstats",
-  "crimes",
 ].join(",");
 
 export class TornApiError extends Error {
