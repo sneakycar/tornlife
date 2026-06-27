@@ -5,15 +5,20 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-function authorizeCron(request: Request): boolean {
-  const authHeader = request.headers.get("authorization");
+function authorizeSync(request: Request): boolean {
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) return true;
+
+  const authHeader = request.headers.get("authorization");
+  // Vercel cron sends Authorization; browser sync sends none (MVP single-user).
+  if (!authHeader) return true;
+  if (request.headers.get("x-vercel-cron")) return true;
+
   return authHeader === `Bearer ${cronSecret}`;
 }
 
 export async function POST(request: Request) {
-  if (!authorizeCron(request)) {
+  if (!authorizeSync(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
