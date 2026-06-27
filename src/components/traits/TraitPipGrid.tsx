@@ -7,6 +7,7 @@ import {
 
 interface TraitPipGridProps {
   meters: LoreMeters;
+  hideHeading?: boolean;
 }
 
 /** Ten diagonal segments in a pill bar — retro sports-game meter style. */
@@ -60,10 +61,10 @@ function TraitRow({
   );
 }
 
-export function TraitPipGrid({ meters }: TraitPipGridProps) {
+export function TraitPipGrid({ meters, hideHeading }: TraitPipGridProps) {
   return (
     <section className="dossier-section dossier-traits" aria-label="Character traits">
-      <h2 className="dossier-heading">Traits</h2>
+      {!hideHeading && <h2 className="dossier-heading">Traits</h2>}
       <div className="trait-grid">
         {TRAIT_DEFINITIONS.map((trait) => (
           <TraitRow

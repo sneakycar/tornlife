@@ -20,7 +20,7 @@ export function EvidenceSection({ evidence }: EvidenceSectionProps) {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
       >
-        {open ? "Hide evidence" : "View record"}
+        {open ? "Hide record" : "View record"}
       </button>
       {open && (
         <div className="evidence-panel">

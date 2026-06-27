@@ -1,6 +1,7 @@
 "use client";
 
 import type { PlayerProfile } from "@/lib/db/types";
+import type { BiographyTimeline } from "@/lib/biography/types";
 import type { FileNoticedItem } from "@/lib/trends/file-noticed";
 import type { PageEvidence } from "@/lib/ui/page-evidence";
 import { DossierView } from "./dossier/DossierView";
@@ -10,6 +11,7 @@ import { useState } from "react";
 
 interface AssessmentScreenProps {
   profile: PlayerProfile;
+  timeline: BiographyTimeline;
   fileNoticed: FileNoticedItem[];
   pageEvidence: PageEvidence;
   onLock: () => Promise<void>;
@@ -23,6 +25,7 @@ interface AssessmentScreenProps {
 
 export function AssessmentScreen({
   profile,
+  timeline,
   fileNoticed,
   pageEvidence,
   onLock,
@@ -73,6 +76,7 @@ export function AssessmentScreen({
         profile={profile}
         interpretation={profile.interpretation_state}
         facts={profile.character_facts}
+        timeline={timeline}
         fileNoticed={fileNoticed}
         pageEvidence={pageEvidence}
       />

@@ -241,15 +241,15 @@ export class CharacterEngine {
         { changes: changes.narrativeHints },
       );
       if (entry) newEntries.push(entry);
-    } else if (this.shouldGenerateAmbient(player)) {
+    } else {
       const entry = await this.selectLogEntry(
         player,
-        "ambient_life",
+        "recent_observation",
         "quiet_day",
         playerTags,
         meters,
         "ambient",
-        { type: "ambient" },
+        { type: "biography_beat" },
       );
       if (entry) newEntries.push(entry);
     }

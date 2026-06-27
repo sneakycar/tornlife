@@ -5,21 +5,24 @@ import type {
   LifeEntry,
   PlayerProfile,
 } from "@/lib/db/types";
+import type { BiographyTimeline } from "@/lib/biography/types";
 import type { FileNoticedItem } from "@/lib/trends/file-noticed";
 import type { PageEvidence } from "@/lib/ui/page-evidence";
 import { IdentitySection } from "./IdentitySection";
 import { FileNoticedSection } from "./FileNoticedSection";
 import { KnownCanonSection } from "./KnownCanonSection";
 import { EvidenceSection } from "./EvidenceSection";
-import { Logbook } from "../Logbook";
+import { BiographyTimelineSection } from "../biography/BiographyTimelineSection";
+import { RunningLifeSection } from "../biography/RunningLifeSection";
+import { BecomingSection } from "../biography/BecomingSection";
 import { TraitPipGrid } from "../traits/TraitPipGrid";
-import { ArchetypeSystem } from "../archetypes/ArchetypeSystem";
 import { voiceLine } from "@/lib/ui/narrator-voice";
 
 interface DossierViewProps {
   profile: PlayerProfile;
   interpretation: InterpretationState | null;
   facts: CharacterFacts | null;
+  timeline: BiographyTimeline;
   fileNoticed: FileNoticedItem[];
   pageEvidence: PageEvidence;
   entries?: LifeEntry[];
@@ -35,6 +38,7 @@ export function DossierView({
   interpretation,
   fileNoticed,
   pageEvidence,
+  timeline,
   entries,
   newEntryIds,
   onFeedback,
@@ -42,15 +46,10 @@ export function DossierView({
   onUnpin,
   feedbackBusy,
 }: DossierViewProps) {
-  const currentRead =
+  const whoLine =
     interpretation?.character_state_summary ??
     profile.assessment_data?.assessment_text ??
     "";
-
-  const biographyLines = (profile.file_notes ?? [])
-    .filter((n) => n.status !== "archived")
-    .slice(-3)
-    .map((n) => n.text);
 
   const emerging: EmergingArchetype[] =
     interpretation?.emerging_archetypes ??
@@ -62,44 +61,35 @@ export function DossierView({
 
   return (
     <div className="dossier">
-      <IdentitySection username={profile.username} />
+      <IdentitySection username={profile.username} whoLine={whoLine} />
 
-      {currentRead && (
-        <section className="dossier-section dossier-current-read">
-          <p className="dossier-current-state">{voiceLine(currentRead)}</p>
-          {biographyLines.map((line) => (
-            <p key={line} className="dossier-biography-line">
-              {voiceLine(line)}
-            </p>
-          ))}
-        </section>
+      <BiographyTimelineSection timeline={timeline} />
+
+      {entries && entries.length > 0 && (
+        <RunningLifeSection
+          entries={entries}
+          newEntryIds={newEntryIds}
+          onFeedback={onFeedback}
+          onPin={onPin}
+          onUnpin={onUnpin}
+          feedbackBusy={feedbackBusy}
+        />
       )}
 
-      <FileNoticedSection items={fileNoticed} />
-
-      <TraitPipGrid meters={profile.lore_meters} />
-
-      {entries && (
-        <section className="dossier-section dossier-biography-entries">
-          {entries.length > 0 && (
-            <h2 className="dossier-heading">Recent Entries</h2>
-          )}
-          <Logbook
-            entries={entries}
-            newEntryIds={newEntryIds}
-            onFeedback={onFeedback}
-            onPin={onPin}
-            onUnpin={onUnpin}
-            feedbackBusy={feedbackBusy}
-          />
-        </section>
+      {fileNoticed.length > 0 && (
+        <FileNoticedSection items={fileNoticed} />
       )}
 
-      <ArchetypeSystem
+      <BecomingSection
         profile={profile}
         emerging={emerging}
-        fileNoticed={fileNoticed}
+        timeline={timeline}
       />
+
+      <details className="dossier-section dossier-traits-collapsed">
+        <summary className="dossier-heading dossier-heading--button">Traits</summary>
+        <TraitPipGrid meters={profile.lore_meters} hideHeading />
+      </details>
 
       <KnownCanonSection
         canon={profile.character_state.canon}

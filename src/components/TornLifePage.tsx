@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { LifeEntry, PlayerProfile } from "@/lib/db/types";
+import type { BiographyTimeline } from "@/lib/biography/types";
 import type { FileNoticedItem } from "@/lib/trends/file-noticed";
 import type { PageEvidence } from "@/lib/ui/page-evidence";
 import { AssessmentScreen } from "@/components/AssessmentScreen";
@@ -13,6 +14,7 @@ import { showEngineDebugUi } from "@/lib/character/debug-client";
 interface LifeData {
   profile: PlayerProfile;
   entries: LifeEntry[];
+  timeline: BiographyTimeline;
   fileNoticed: FileNoticedItem[];
   pageEvidence: PageEvidence;
 }
@@ -221,6 +223,7 @@ export function TornLifePage() {
         {data && !locked && (
           <AssessmentScreen
             profile={data.profile}
+            timeline={data.timeline}
             fileNoticed={data.fileNoticed}
             pageEvidence={data.pageEvidence}
             onLock={handleLock}
@@ -237,6 +240,7 @@ export function TornLifePage() {
           <GroundedHome
             profile={data.profile}
             entries={data.entries}
+            timeline={data.timeline}
             fileNoticed={data.fileNoticed}
             pageEvidence={data.pageEvidence}
             newEntryIds={newEntryIds}

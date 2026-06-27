@@ -1503,6 +1503,151 @@ body {
   font-size: 0.85rem;
 }
 
+/* ─── Biography timeline (autobiography-first) ─── */
+
+.dossier-bio-timeline {
+  padding-bottom: 1.25rem;
+}
+
+.bio-timeline-empty,
+.bio-window-empty {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  max-width: 40ch;
+}
+
+.bio-window {
+  margin-bottom: 1.35rem;
+}
+
+.bio-window:last-child {
+  margin-bottom: 0;
+}
+
+.bio-window-title {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-rust);
+  margin: 0 0 0.65rem;
+}
+
+.bio-beat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.bio-beat {
+  margin-bottom: 0.85rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--border-dim);
+}
+
+.bio-beat:last-child {
+  margin-bottom: 0;
+}
+
+.bio-beat-narrative {
+  margin: 0;
+  color: var(--text-bright);
+  font-size: 1rem;
+  line-height: 1.55;
+  max-width: 42ch;
+}
+
+.bio-beat-reality {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  font-family: var(--font-share-tech), monospace;
+  letter-spacing: 0.06em;
+}
+
+.dossier-running-life {
+  padding-bottom: 1.5rem;
+}
+
+.running-life-sub {
+  margin: -0.5rem 0 1rem;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+.dossier-becoming--pending .becoming-pending {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  max-width: 40ch;
+}
+
+.becoming-conclusion {
+  margin: 0 0 0.65rem;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+}
+
+.becoming-archetype-name {
+  font-family: var(--font-share-tech), monospace;
+  letter-spacing: 0.14em;
+  color: var(--text-bright);
+  text-transform: uppercase;
+}
+
+.becoming-explanation,
+.becoming-drift {
+  margin: 0 0 0.5rem;
+  font-size: 0.92rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  max-width: 40ch;
+}
+
+.becoming-board-details {
+  margin-top: 1rem;
+}
+
+.becoming-board-details summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.becoming-board-wrap {
+  margin-top: 1rem;
+}
+
+.dossier-traits-collapsed {
+  border-bottom: 1px solid var(--border-dim);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.dossier-traits-collapsed summary {
+  list-style: none;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+}
+
+.dossier-heading--button {
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.dossier-traits-collapsed .dossier-traits {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border: none;
+}
+
+.dossier-identity .dossier-heading {
+  margin-bottom: 0.65rem;
+}
+
 /* ─── Trait meters (2×3, diagonal segmented retro bars) ─── */
 
 .trait-grid {
