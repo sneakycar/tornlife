@@ -53,6 +53,13 @@ import {
 } from "./file-notes";
 import { recordTrendData } from "../trends/record";
 import { applyArchetypeMeta } from "../archetypes/reclassification";
+import {
+  runLifeEngine,
+  markRhythmWrote,
+  markRhythmQuiet,
+  loadLifeEngineSnapshot,
+  type LifeEngineSnapshot,
+} from "../life-engine";
 import type { SelectionContext, SelectedContentRow } from "../selection/types";
 import type { ContentType } from "../selection/constants";
 
@@ -66,6 +73,8 @@ export interface SyncResult {
 }
 
 export class CharacterEngine {
+  private lifeEngineSnapshot: LifeEngineSnapshot | null = null;
+
   private get db() {
     return createServiceClient();
   }
@@ -174,6 +183,14 @@ export class CharacterEngine {
       apiKey,
     });
 
+    this.lifeEngineSnapshot = await runLifeEngine({
+      playerId: player.id,
+      facts: normalized.characterFacts,
+      tornData,
+      hasMeaningfulChanges: changes.hasMeaningfulChanges,
+      storedState: player.life_engine_state,
+    });
+
     const archetypeState = applyArchetypeMeta(
       player.character_state,
       player.archetype,
@@ -229,29 +246,41 @@ export class CharacterEngine {
     }
 
     const newEntries: LifeEntry[] = [];
+    const life = this.lifeEngineSnapshot;
 
-    if (changes.hasMeaningfulChanges) {
+    if (life?.rhythmDecision.should_write) {
+      const eventFamily =
+        life.threads.find((t) => t.status === "active")?.thread_key ??
+        detectPrimaryEvent(changes, factChanges, "sync");
+
+      const contentType = changes.hasMeaningfulChanges
+        ? "what_changed"
+        : life.rhythmDecision.intensity === "high"
+          ? "recent_observation"
+          : "ambient_life";
+
       const entry = await this.selectLogEntry(
         player,
-        "what_changed",
-        detectPrimaryEvent(changes, factChanges, "sync"),
-        playerTags,
+        contentType,
+        eventFamily,
+        mergeTagSets(playerTags, life.writingTags),
         meters,
-        "reactive",
-        { changes: changes.narrativeHints },
+        changes.hasMeaningfulChanges ? "reactive" : "ambient",
+        {
+          life_engine: true,
+          rhythm: life.rhythmDecision,
+          threads: life.threads.map((t) => t.thread_key),
+          callbacks: life.callbacks,
+        },
       );
-      if (entry) newEntries.push(entry);
-    } else {
-      const entry = await this.selectLogEntry(
-        player,
-        "recent_observation",
-        "quiet_day",
-        playerTags,
-        meters,
-        "ambient",
-        { type: "biography_beat" },
-      );
-      if (entry) newEntries.push(entry);
+      if (entry) {
+        newEntries.push(entry);
+        await markRhythmWrote(player.id, life.state);
+      } else {
+        await markRhythmQuiet(player.id, life.state);
+      }
+    } else if (life) {
+      await markRhythmQuiet(player.id, life.state);
     }
 
     const updated = await this.getPlayerById(player.id);
@@ -633,6 +662,11 @@ export class CharacterEngine {
     return this.getOrCreatePlayer();
   }
 
+  async getLifeEngineSnapshot(): Promise<LifeEngineSnapshot | null> {
+    const player = await this.getOrCreatePlayer();
+    return loadLifeEngineSnapshot(player.id, player.life_engine_state);
+  }
+
   async getEntries(limit = 50): Promise<LifeEntry[]> {
     const player = await this.getOrCreatePlayer();
     const { data, error } = await this.db
@@ -874,6 +908,7 @@ export class CharacterEngine {
       player.blocked_tags,
       player.preferred_tags,
       player.player_tags,
+      this.lifeEngineSnapshot,
     );
 
     const pick = await this.selection.selectOne(contentType, ctx, player.id);
@@ -909,6 +944,7 @@ export class CharacterEngine {
     blockedTags: string[],
     preferredTags: string[],
     archetypeTags: string[],
+    life?: LifeEngineSnapshot | null,
   ): SelectionContext {
     return {
       playerTags,
@@ -918,6 +954,11 @@ export class CharacterEngine {
       archetypeTags,
       loreMeters: meters,
       eventFamily,
+      lifeWritingTags: life?.writingTags ?? [],
+      memoryCallbacks: life?.callbacks ?? [],
+      activeThreadKeys: life?.threads
+        .filter((t) => t.status === "active")
+        .map((t) => `thread:${t.thread_key}`),
     };
   }
 
@@ -1027,6 +1068,7 @@ export class CharacterEngine {
       initialized: row.initialized as boolean,
       last_sync_at: row.last_sync_at as string | null,
       last_ambient_at: row.last_ambient_at as string | null,
+      life_engine_state: (row.life_engine_state as Record<string, unknown>) ?? null,
       created_at: row.created_at as string,
       updated_at: row.updated_at as string,
     };

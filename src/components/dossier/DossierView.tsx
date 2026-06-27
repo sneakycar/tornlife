@@ -15,6 +15,8 @@ import { EvidenceSection } from "./EvidenceSection";
 import { BiographyTimelineSection } from "../biography/BiographyTimelineSection";
 import { RunningLifeSection } from "../biography/RunningLifeSection";
 import { BecomingSection } from "../biography/BecomingSection";
+import { StoryThreadsSection } from "../biography/StoryThreadsSection";
+import type { LifeEngineSnapshot } from "@/lib/life-engine";
 import { TraitPipGrid } from "../traits/TraitPipGrid";
 import { voiceLine } from "@/lib/ui/narrator-voice";
 
@@ -23,6 +25,7 @@ interface DossierViewProps {
   interpretation: InterpretationState | null;
   facts: CharacterFacts | null;
   timeline: BiographyTimeline;
+  lifeEngine: LifeEngineSnapshot | null;
   fileNoticed: FileNoticedItem[];
   pageEvidence: PageEvidence;
   entries?: LifeEntry[];
@@ -39,6 +42,7 @@ export function DossierView({
   fileNoticed,
   pageEvidence,
   timeline,
+  lifeEngine,
   entries,
   newEntryIds,
   onFeedback,
@@ -78,6 +82,10 @@ export function DossierView({
 
       {fileNoticed.length > 0 && (
         <FileNoticedSection items={fileNoticed} />
+      )}
+
+      {lifeEngine && lifeEngine.threads.length > 0 && (
+        <StoryThreadsSection threads={lifeEngine.threads} />
       )}
 
       <BecomingSection

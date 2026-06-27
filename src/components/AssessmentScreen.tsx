@@ -2,6 +2,7 @@
 
 import type { PlayerProfile } from "@/lib/db/types";
 import type { BiographyTimeline } from "@/lib/biography/types";
+import type { LifeEngineSnapshot } from "@/lib/life-engine";
 import type { FileNoticedItem } from "@/lib/trends/file-noticed";
 import type { PageEvidence } from "@/lib/ui/page-evidence";
 import { DossierView } from "./dossier/DossierView";
@@ -12,6 +13,7 @@ import { useState } from "react";
 interface AssessmentScreenProps {
   profile: PlayerProfile;
   timeline: BiographyTimeline;
+  lifeEngine: LifeEngineSnapshot | null;
   fileNoticed: FileNoticedItem[];
   pageEvidence: PageEvidence;
   onLock: () => Promise<void>;
@@ -26,6 +28,7 @@ interface AssessmentScreenProps {
 export function AssessmentScreen({
   profile,
   timeline,
+  lifeEngine,
   fileNoticed,
   pageEvidence,
   onLock,
@@ -77,6 +80,7 @@ export function AssessmentScreen({
         interpretation={profile.interpretation_state}
         facts={profile.character_facts}
         timeline={timeline}
+        lifeEngine={lifeEngine}
         fileNoticed={fileNoticed}
         pageEvidence={pageEvidence}
       />

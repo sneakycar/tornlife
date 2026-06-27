@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { LifeEntry, PlayerProfile } from "@/lib/db/types";
 import type { BiographyTimeline } from "@/lib/biography/types";
+import type { LifeEngineSnapshot } from "@/lib/life-engine";
 import type { FileNoticedItem } from "@/lib/trends/file-noticed";
 import type { PageEvidence } from "@/lib/ui/page-evidence";
 import { AssessmentScreen } from "@/components/AssessmentScreen";
@@ -15,6 +16,7 @@ interface LifeData {
   profile: PlayerProfile;
   entries: LifeEntry[];
   timeline: BiographyTimeline;
+  lifeEngine: LifeEngineSnapshot | null;
   fileNoticed: FileNoticedItem[];
   pageEvidence: PageEvidence;
 }
@@ -224,6 +226,7 @@ export function TornLifePage() {
           <AssessmentScreen
             profile={data.profile}
             timeline={data.timeline}
+            lifeEngine={data.lifeEngine}
             fileNoticed={data.fileNoticed}
             pageEvidence={data.pageEvidence}
             onLock={handleLock}
@@ -241,6 +244,7 @@ export function TornLifePage() {
             profile={data.profile}
             entries={data.entries}
             timeline={data.timeline}
+            lifeEngine={data.lifeEngine}
             fileNoticed={data.fileNoticed}
             pageEvidence={data.pageEvidence}
             newEntryIds={newEntryIds}

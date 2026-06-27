@@ -47,6 +47,10 @@ export interface SelectionContext {
   archetypeTags: string[];
   loreMeters: LoreMeters;
   eventFamily: EventFamily | string;
+  /** Tags from life engine — threads, variables, consequences */
+  lifeWritingTags?: string[];
+  memoryCallbacks?: string[];
+  activeThreadKeys?: string[];
   summary?: NormalizedSummary;
   changes?: ChangeSummary;
   factChanges?: FactChange[];

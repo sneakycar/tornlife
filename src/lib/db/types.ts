@@ -205,6 +205,7 @@ export interface PlayerProfile {
   initialized: boolean;
   last_sync_at: string | null;
   last_ambient_at: string | null;
+  life_engine_state: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 }

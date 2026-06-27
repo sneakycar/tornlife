@@ -9,12 +9,14 @@ import type { LifeEntry, PlayerProfile } from "../db/types";
 import type { FileNoticedItem } from "../trends/file-noticed";
 import type { PageEvidence } from "../ui/page-evidence";
 import type { BiographyTimeline } from "../biography/types";
+import type { LifeEngineSnapshot } from "../life-engine";
 
 export interface LifePageData {
   profile: PlayerProfile;
   entries: LifeEntry[];
   syncing: boolean;
   timeline: BiographyTimeline;
+  lifeEngine: LifeEngineSnapshot | null;
   fileNoticed: FileNoticedItem[];
   pageEvidence: PageEvidence;
 }
@@ -77,7 +79,14 @@ export class LifeService {
       }
     }
 
-    return { profile, entries, syncing: false, timeline, fileNoticed, pageEvidence };
+    let lifeEngine: LifeEngineSnapshot | null = null;
+    try {
+      lifeEngine = await engine.getLifeEngineSnapshot();
+    } catch {
+      lifeEngine = null;
+    }
+
+    return { profile, entries, syncing: false, timeline, lifeEngine, fileNoticed, pageEvidence };
   }
 
   async sync(): Promise<{

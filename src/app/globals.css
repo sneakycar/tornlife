@@ -1648,6 +1648,40 @@ body {
   margin-bottom: 0.65rem;
 }
 
+.story-thread-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.story-thread {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  margin-bottom: 0.45rem;
+  font-size: 0.95rem;
+  color: var(--text-bright);
+}
+
+.story-thread-label {
+  font-family: var(--font-share-tech), monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+.story-thread--fading .story-thread-label {
+  opacity: 0.55;
+}
+
+.story-thread-fade {
+  font-family: var(--font-share-tech), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
 /* ─── Trait meters (2×3, diagonal segmented retro bars) ─── */
 
 .trait-grid {

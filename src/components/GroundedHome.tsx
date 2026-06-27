@@ -1,5 +1,6 @@
 import type { PlayerProfile } from "@/lib/db/types";
 import type { BiographyTimeline } from "@/lib/biography/types";
+import type { LifeEngineSnapshot } from "@/lib/life-engine";
 import type { FileNoticedItem } from "@/lib/trends/file-noticed";
 import type { PageEvidence } from "@/lib/ui/page-evidence";
 import { DossierView } from "./dossier/DossierView";
@@ -9,6 +10,7 @@ interface GroundedHomeProps {
   profile: PlayerProfile;
   entries: LifeEntry[];
   timeline: BiographyTimeline;
+  lifeEngine: LifeEngineSnapshot | null;
   fileNoticed: FileNoticedItem[];
   pageEvidence: PageEvidence;
   newEntryIds?: Set<string>;
@@ -23,6 +25,7 @@ export function GroundedHome({
   profile,
   entries,
   timeline,
+  lifeEngine,
   fileNoticed,
   pageEvidence,
   newEntryIds,
@@ -39,6 +42,7 @@ export function GroundedHome({
         interpretation={profile.interpretation_state}
         facts={profile.character_facts}
         timeline={timeline}
+        lifeEngine={lifeEngine}
         fileNoticed={fileNoticed}
         pageEvidence={pageEvidence}
         entries={entries}

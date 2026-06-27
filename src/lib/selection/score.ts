@@ -11,7 +11,7 @@ export function filterEligibleSeeds(
   history: SelectedContentRow[],
   options?: { relaxCanon?: boolean },
 ): ContentSeed[] {
-  const allTags = [...ctx.playerTags, ...ctx.archetypeTags];
+  const allTags = [...ctx.playerTags, ...ctx.archetypeTags, ...(ctx.lifeWritingTags ?? [])];
   const relaxCanon = options?.relaxCanon ?? false;
 
   return seeds.filter((seed) => {
@@ -49,6 +49,7 @@ export function scoreCandidate(
   }
   for (const tag of seed.state_tags) {
     if (ctx.playerTags.includes(tag)) score += 10;
+    if (ctx.lifeWritingTags?.includes(tag)) score += 18;
   }
   for (const tag of seed.tone_tags) {
     if (ctx.preferredTags.includes(tag)) score += 15;
@@ -63,6 +64,12 @@ export function scoreCandidate(
   score -= recentlyUsedPenalty(seed, history);
 
   if (seed.required_tags.length > 3) score += 5;
+
+  if (ctx.activeThreadKeys?.length) {
+    for (const key of ctx.activeThreadKeys) {
+      if (seed.event_family.includes(key.replace("thread:", ""))) score += 8;
+    }
+  }
 
   return Math.max(1, score);
 }
