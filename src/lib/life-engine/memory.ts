@@ -37,6 +37,8 @@ export async function recordMemoryFromDelta(
     if (!count || count <= 0) continue;
     const narrativeFn = NARRATIVE[key];
     if (!narrativeFn) continue;
+    // Single events are engine fuel, not biography pages
+    if (count < 2 && key !== "hospital" && key !== "jailed") continue;
 
     const narrative = narrativeFn(count);
     const reality = realityLine(key, count);

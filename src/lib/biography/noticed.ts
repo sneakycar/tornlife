@@ -1,6 +1,19 @@
 import type { FileNoticedItem } from "../trends/file-noticed";
 import type { TrendConfidence } from "../trends/types";
+import type { LifeEngineSnapshot } from "../life-engine";
 import type { BiographyTimeline } from "./types";
+
+const THREAD_NOTICED: Record<string, string> = {
+  alcohol_spiral: "Drinking stopped looking like recreation. It started looking like maintenance.",
+  hospital_routine: "Hospital time is no longer an emergency — it is a recurring appointment.",
+  crime_spree: "Crime is no longer a decision point. It is just another afternoon.",
+  money_problems: "Money keeps leaving faster than the life it is supposed to fund.",
+  gambling_streak: "Luck has become a habit he keeps paying to test.",
+  travel_lifestyle: "He keeps leaving town like distance might reorganize the mess.",
+  combat_routine: "Violence has stopped feeling like an event. It feels like weather.",
+  chemical_reliance: "The medicine cabinet is emptying faster than the excuses.",
+  career_stability: "The respectable job is still the cover story that works.",
+};
 
 function tagCounts(timeline: BiographyTimeline): Record<string, number> {
   const counts: Record<string, number> = {};
@@ -51,12 +64,6 @@ const PATTERN_LINES: Array<{
     confidence: "low",
   },
   {
-    tag: "employment",
-    min: 1,
-    line: "The company is becoming an alibi.",
-    confidence: "high",
-  },
-  {
     tag: "medical_item_use",
     min: 2,
     line: "Medical supplies are leaving faster than excuses.",
@@ -69,6 +76,36 @@ const PATTERN_LINES: Array<{
     confidence: "medium",
   },
 ];
+
+export function buildFileNoticedFromLifeEngine(
+  lifeEngine: LifeEngineSnapshot | null,
+): FileNoticedItem[] {
+  if (!lifeEngine) return [];
+
+  const items: FileNoticedItem[] = [];
+  for (const thread of lifeEngine.threads) {
+    if (thread.status !== "active") continue;
+    const line = THREAD_NOTICED[thread.thread_key];
+    if (!line) continue;
+    items.push({
+      id: `thread-${thread.thread_key}`,
+      line,
+      evidence: [`Sustained pattern: ${thread.label}.`],
+      confidence: thread.intensity >= 50 ? "high" : "medium",
+    });
+  }
+
+  for (const [i, callback] of lifeEngine.callbacks.entries()) {
+    items.push({
+      id: `callback-${i}`,
+      line: callback,
+      evidence: ["Continuity from earlier file notes."],
+      confidence: "medium",
+    });
+  }
+
+  return items.slice(0, 6);
+}
 
 /** Pattern observations derived from accumulated biography beats — not raw stats alone. */
 export function buildFileNoticedFromTimeline(

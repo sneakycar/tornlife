@@ -17,14 +17,11 @@ function windowLabel(window: string): string {
 
 function alcoholLine(fact: TrendFact, deltas7d: ActivityCounters): string | null {
   const recent = deltas7d.alcoholused ?? 0;
-  if (fact.trend === "extreme" || fact.count >= 1000) {
+  if (fact.trend === "extreme" || (fact.count >= 50 && fact.window !== "lifetime")) {
     return "Drinking is no longer background noise.";
   }
-  if (fact.trend === "increasing" || recent > 0) {
+  if ((fact.trend === "increasing" && recent >= 8) || recent >= 15) {
     return "Drinking pattern increased recently.";
-  }
-  if (fact.window === "lifetime" && fact.count > 200) {
-    return "The file has a long alcohol history on record.";
   }
   return null;
 }
@@ -44,26 +41,29 @@ function moneyLine(fact: TrendFact, deltas7d: ActivityCounters): string | null {
   return null;
 }
 
-function hospitalLine(fact: TrendFact): string {
+function hospitalLine(fact: TrendFact): string | null {
   if (fact.count >= 5 || fact.trend === "increasing") {
     return "Hospital time has become too familiar.";
   }
-  return "Hospital visits are showing up on the record again.";
+  return null;
 }
 
-function fightLine(fact: TrendFact): string {
-  if (fact.count >= 10 || fact.trend === "increasing") {
+function fightLine(fact: TrendFact): string | null {
+  if (fact.count >= 8 || fact.trend === "increasing") {
     return "Fights are becoming routine.";
   }
-  return "Combat keeps appearing in the file.";
+  return null;
 }
 
 function crimeLine(fact: TrendFact, deltas7d: ActivityCounters): string | null {
-  const recent = deltas7d.criminaloffenses ?? deltas7d.vandalism ?? 0;
-  if (recent > 0 || fact.trend === "increasing") {
+  const recent =
+    (deltas7d.criminaloffenses ?? 0) +
+    (deltas7d.vandalism ?? 0) +
+    (deltas7d.theft ?? 0);
+  if (recent >= 5 || (fact.trend === "increasing" && fact.count >= 8)) {
     return "Crimes are accumulating with less visible panic.";
   }
-  return "Criminal activity keeps adding lines to the file.";
+  return null;
 }
 
 function drugLine(fact: TrendFact, deltas7d: ActivityCounters): string | null {
@@ -71,10 +71,10 @@ function drugLine(fact: TrendFact, deltas7d: ActivityCounters): string | null {
     (deltas7d.drugsused ?? 0) +
     (deltas7d.medicalitemsused ?? 0) +
     (deltas7d.xantaken ?? 0);
-  if (recent > 0 || fact.trend === "increasing") {
+  if (recent >= 5 || (fact.trend === "increasing" && fact.count >= 10)) {
     return "Medical and chemical use is climbing on the record.";
   }
-  return "The file notes increased chemical reliance.";
+  return null;
 }
 
 function factEvidence(fact: TrendFact): string[] {
@@ -114,29 +114,8 @@ function changeToLine(change: InterpretedChange): string | null {
   return text.endsWith(".") ? text : `${text}.`;
 }
 
-function contextualLines(facts: CharacterFacts | null | undefined): FileNoticedItem[] {
-  if (!facts) return [];
-  const items: FileNoticedItem[] = [];
-
-  if (facts.company) {
-    items.push({
-      id: "ctx-employment",
-      line: "The company job is still the respectable part of the file.",
-      evidence: [`Employment: ${facts.company}`, facts.job_position ? `Role: ${facts.job_position}` : ""].filter(Boolean),
-      confidence: "high",
-    });
-  }
-
-  if (facts.faction) {
-    items.push({
-      id: "ctx-faction",
-      line: "Faction membership remains active, but belonging still looks optional.",
-      evidence: [`Faction: ${facts.faction}`],
-      confidence: "high",
-    });
-  }
-
-  return items;
+function contextualLines(_facts: CharacterFacts | null | undefined): FileNoticedItem[] {
+  return [];
 }
 
 export function buildFileNoticed(input: {

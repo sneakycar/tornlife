@@ -1,7 +1,7 @@
 import type { PageEvidence } from "../ui/page-evidence";
 import type { BiographyTimeline } from "./types";
 
-/** Receipt-style evidence from biography reality lines — not a profile dump. */
+/** Pattern-level receipts only — never a raw event log dump. */
 export function buildEvidenceFromTimeline(
   timeline: BiographyTimeline,
   confidence: PageEvidence["confidence"],
@@ -10,18 +10,18 @@ export function buildEvidenceFromTimeline(
 
   for (const window of timeline.windows) {
     for (const beat of window.beats) {
-      if (!bullets.includes(beat.reality)) {
+      if (beat.reality && !bullets.includes(beat.reality)) {
         bullets.push(beat.reality);
       }
     }
   }
 
   if (bullets.length === 0) {
-    bullets.push("Recent activity not yet recorded — sync history still building.");
+    bullets.push("No sustained patterns confirmed yet — the file is still accumulating history.");
   }
 
   return {
-    bullets: bullets.slice(0, 12),
+    bullets: bullets.slice(0, 8),
     confidence,
   };
 }
